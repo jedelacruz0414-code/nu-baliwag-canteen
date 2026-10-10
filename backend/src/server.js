@@ -46,6 +46,16 @@ const todayInManila = () =>
   new Intl.DateTimeFormat('en-CA', {
     timeZone: 'Asia/Manila'
   }).format(new Date());
+const currentMinutesInManila = () => {
+  const parts = new Intl.DateTimeFormat('en-GB', {
+    timeZone: 'Asia/Manila',
+    hour: '2-digit',
+    minute: '2-digit',
+    hourCycle: 'h23'
+  }).formatToParts(new Date());
+  const values = Object.fromEntries(parts.map(part => [part.type, part.value]));
+  return Number(values.hour) * 60 + Number(values.minute);
+};
 const requireAuth = (req, res, next) => {
   const token = req.get('authorization')?.match(/^Bearer (.+)$/i)?.[1];
   if (!token) {
@@ -187,6 +197,15 @@ app.post('/api/reservations', requireAuth, asyncRoute(async (req, res) => {
   if (date < todayInManila()) {
     return res.status(400).json({
       error: 'Reservations cannot be made in the past.'
+    });
+  }
+  const [slotHour, slotMinute] = slot.split(':').map(Number);
+  if (
+    date === todayInManila() &&
+    slotHour * 60 + slotMinute <= currentMinutesInManila()
+  ) {
+    return res.status(400).json({
+      error: 'Reservations cannot be made for a time slot that has already started.'
     });
   }
   const connection = await pool.getConnection();

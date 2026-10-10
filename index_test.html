@@ -258,7 +258,13 @@ label{display:block;font-size:12px;font-weight:600;color:var(--mut);margin-botto
 const P=n=>"₱"+n.toFixed(2);
 
 const localDateInput=()=>new Date(Date.now()-new Date().getTimezoneOffset()*60000).toISOString().slice(0,10);
-
+const manilaDateInput=()=>new Intl.DateTimeFormat("en-CA",{timeZone:"Asia/Manila"}).format(new Date());
+const manilaMinutesNow=()=>{
+ const parts=new Intl.DateTimeFormat("en-GB",{timeZone:"Asia/Manila",hour:"2-digit",minute:"2-digit",hourCycle:"h23"}).formatToParts(new Date());
+ const values=Object.fromEntries(parts.map(part=>[part.type,part.value]));
+ return Number(values.hour)*60+Number(values.minute);
+};
+const reservationSlotPassed=(date,slot)=>date<manilaDateInput()||(date===manilaDateInput()&&Number(slot)<=manilaMinutesNow());
 const S={role:'s',loggedIn:false,view:'login',tab:'home',apage:'dash',sel:null,resSel:null,resDate:localDateInput(),resSlot:null,cat:'All',checked:true,left:1200,menuOpen:false,notifOpen:false,
 
  user:{name:"Juan Dela Cruz",id:"2023-161302",email:"jdelacruz@nu-baliwag.edu.ph",phone:"0917 555 0148"},
@@ -894,7 +900,7 @@ const checkin=id=>{const reservation=S.res.find(item=>item.id==id);if(!reservati
 const nowStr=()=>new Date().toLocaleString([], {month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'});
 
 const confirmOrder=async n=>{
- if(!S.resDate||!S.resSlot||S.resDate<localDateInput()){
+ if(!S.resDate||!S.resSlot||S.resDate<localDateInput()||reservationSlotPassed(S.resDate,S.resSlot)){
   alert("Select a reservation date and time slot before confirming.");
   go("reserve"); return;
  }
@@ -972,6 +978,11 @@ async function selectReservationSlot(slot){
 
 const reserveTable=async n=>{
  const table=S.tables.find(x=>x.n==n);
+ if(S.resDate&&S.resSlot&&reservationSlotPassed(S.resDate,S.resSlot)){
+  alert("That time slot has already started. Please choose a future time.");
+  S.resSlot=null;S.resSel=null;tableAvailabilityKey="";r();
+  return;
+ }
  if(!hasTableAvailability(S.resDate,S.resSlot)){
   alert("Please wait for table availability to load, then select an available table.");
   return;
@@ -1253,7 +1264,7 @@ function student(){
 
    ${S.ann.map(a=>`<div class="card" style="padding:13px"><div class="row"><div><b style="font-size:13.5px">${a.t}</b><div class="mut">${a.d}</div></div><span class="mut">${a.w}</span></div></div>`).join("")}</div>`;}
 
- else if(S.view=='reserve'){const t=S.resSel?S.tables.find(x=>x.n==S.resSel):null,slotList=reservationSlots().map(start=>{const slot=String(start),full=isSlotFull(S.resDate,slot),selected=S.resSlot==slot,available=S.tables.filter(table=>table.st!="ds"&&!apiReservedForSlot(table,S.resDate,slot)&&!reservationsForSlot(S.resDate,slot,table.n).length).length;return `<button class="slot-option ${selected?'selected':''} ${full?'full':''}" ${full?'disabled':''} aria-pressed="${selected}" onclick="selectReservationSlot('${slot}')"><span>${reservationSlotLabel(slot)}</span><span class="slot-state">${full?'FULL':selected?'✓ Selected':`Available · ${available} tables`}</span></button>`}).join("");
+ else if(S.view=='reserve'){const t=S.resSel?S.tables.find(x=>x.n==S.resSel):null,slotList=reservationSlots().map(start=>{const slot=String(start),past=reservationSlotPassed(S.resDate,slot),full=isSlotFull(S.resDate,slot),selected=S.resSlot==slot,available=S.tables.filter(table=>table.st!="ds"&&!apiReservedForSlot(table,S.resDate,slot)&&!reservationsForSlot(S.resDate,slot,table.n).length).length;return `<button class="slot-option ${selected?'selected':''} ${past||full?'full':''}" ${past||full?'disabled':''} aria-pressed="${selected}" onclick="selectReservationSlot('${slot}')"><span>${reservationSlotLabel(slot)}</span><span class="slot-state">${past?'PAST':full?'FULL':selected?'✓ Selected':`Available · ${available} tables`}</span></button>`}).join("");
 
   h=head("Select a Table",'home')+`<div class="sbody">
 

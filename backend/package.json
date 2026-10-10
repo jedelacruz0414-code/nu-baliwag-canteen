@@ -1,0 +1,25 @@
+{
+  "name": "nu-baliwag-canteen-api",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Node.js and MySQL API for the NU Baliwag canteen reservation system",
+  "main": "src/server.js",
+  "scripts": {
+  "start": "node src/server.js",
+  "dev": "node --watch src/server.js",
+  "create-user": "node scripts/create-user.js",
+  "seed": "node scripts/seed-cafeteria-data.js"
+},
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "bcryptjs": "^3.0.2",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^5.1.0",
+    "helmet": "^8.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "mysql2": "^3.14.1"
+  }
+}

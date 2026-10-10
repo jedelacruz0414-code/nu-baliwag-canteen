@@ -1,1826 +1,664 @@
-<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>NU Baliwag Canteen — Table Reservation System</title>
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>NU Baliwag Canteen — Table Reservation System</title>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--navy:#0B2A5B;--navy2:#123a76;--gold:#F0B323;--bg:#eef1f5;--card:#fff;--line:#e3e8ef;--txt:#152238;--mut:#6b7a90;--gr:#2e9e5b;--grb:#d9f0e1;--or:#f0b323;--orb:#fdf2d6;--rd:#d94b4b;--rdb:#fbe0e0;--r:14px;--sh:0 2px 10px rgba(11,42,91,.08)}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;background:var(--bg);color:var(--txt);-webkit-font-smoothing:antialiased}
+button{font:inherit;cursor:pointer;border:0;background:none;color:inherit}
+input,select,textarea{font:inherit;width:100%;padding:11px 13px;border:1px solid var(--line);border-radius:10px;background:#fff;color:var(--txt);outline:none}
+input:focus,select:focus{border-color:var(--navy2)}
+.authwrap{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;background:var(--navy);padding:24px}
+.authtabswrap{margin-bottom:18px}
+.authtabs{display:inline-flex;gap:4px;background:rgba(255,255,255,.12);border-radius:30px;padding:6px}
+.authtabs button{padding:9px 20px;border-radius:24px;font-size:13px;font-weight:600;color:#fff;opacity:.7}
+.authtabs button.on{background:#fff;color:var(--navy);opacity:1}
+/* ---------- student ---------- */
+.phone{width:min(390px,100%);margin:24px auto;background:#fff;border-radius:26px;overflow:hidden;box-shadow:0 18px 50px rgba(11,42,91,.22);display:flex;flex-direction:column;height:820px;max-height:calc(100vh - 48px);position:relative}
+.backdrop{position:absolute;inset:0;background:rgba(11,20,35,.4);z-index:20}
+.drawer{position:absolute;top:0;bottom:0;left:0;width:76%;max-width:280px;background:#fff;z-index:21;padding:20px 14px;display:flex;flex-direction:column;box-shadow:8px 0 26px rgba(0,0,0,.18)}
+.dhead{display:flex;gap:10px;align-items:center;padding-bottom:16px;border-bottom:1px solid var(--line);margin-bottom:10px}
+.drawer nav{display:flex;flex-direction:column;gap:2px}
+.drawer nav button{padding:12px 10px;border-radius:9px;text-align:left;font-weight:600;font-size:13.5px;color:var(--txt)}
+.drawer nav button:hover{background:#f3f6fa}
+.notifpanel{position:absolute;top:64px;right:12px;width:250px;max-height:340px;overflow-y:auto;background:#fff;border-radius:14px;box-shadow:0 12px 34px rgba(0,0,0,.2);z-index:21;padding:12px}
+.nitem{display:flex;gap:9px;padding:9px 4px;border-bottom:1px solid var(--line)}
+.nitem:last-child{border:0}
+.sbody{flex:1;min-height:0;min-width:0;overflow-y:auto;background:var(--bg);padding:14px}
+.shead{background:var(--navy);color:#fff;padding:16px;display:flex;align-items:center;gap:12px}
+.shead h2{font-size:16px;font-weight:600;flex:1;text-align:center}
+.ic{width:34px;height:34px;border-radius:9px;display:grid;place-items:center;font-size:17px}
+.shead .ic{background:rgba(255,255,255,.12)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--sh);padding:16px;margin-bottom:14px}
+.ttl{font-size:13px;font-weight:700;color:var(--mut);letter-spacing:.3px;margin-bottom:10px;text-transform:uppercase}
+.btn{background:var(--navy);color:#fff;padding:13px;border-radius:11px;font-weight:700;width:100%;letter-spacing:.4px}
+.btn.g{background:#fff;color:var(--navy);border:1px solid var(--navy)}
+.btn.d{background:#fff;color:var(--rd);border:1px solid var(--rd)}
+.btn.sm{width:auto;padding:8px 14px;font-size:12.5px;border-radius:9px;font-weight:600}
+.row{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.mut{color:var(--mut);font-size:12.5px}
+.badge{font-size:11px;font-weight:700;padding:5px 10px;border-radius:20px;white-space:nowrap}
+.b-g{background:var(--grb);color:var(--gr)}.b-o{background:var(--orb);color:#9a6b00}.b-res{background:#fce2c4;color:#9a4b00}.b-r{background:var(--rdb);color:var(--rd)}.b-n{background:#e8edf5;color:var(--navy)}
+.timer{font-size:34px;font-weight:800;color:var(--gr);letter-spacing:1px;text-align:center}
+.qa{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.qa div{background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px 6px;text-align:center;font-size:11.5px;font-weight:600;box-shadow:var(--sh)}
+.qa span{display:block;font-size:22px;margin-bottom:6px}
+.bnav{display:flex;background:#fff;border-top:1px solid var(--line)}
+.bnav button{flex:1;padding:10px 0 12px;font-size:10.5px;color:var(--mut);font-weight:600}
+.bnav button span{display:block;font-size:18px;margin-bottom:2px;filter:grayscale(1);opacity:.6}
+.bnav button.on{color:var(--navy)}.bnav button.on span{filter:none;opacity:1}
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.seatgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;max-width:230px;margin:0 auto}
+.stalls{display:flex;gap:8px;margin-bottom:16px}
+.stall{flex:1;background:#fff;border:1px solid var(--line);border-radius:10px;padding:10px 4px;text-align:center;box-shadow:var(--sh)}
+.stall span{display:block;font-size:19px;margin-bottom:2px}
+.stall b{font-size:11px;display:block}
+.stall small{font-size:9.5px;color:var(--mut)}
+.tbl{border-radius:10px;padding:14px 0;text-align:center;font-weight:800;font-size:15px;border:2px solid transparent;position:relative}
+.tbl:before,.tbl:after{content:"";position:absolute;left:22%;right:22%;height:5px;border-radius:3px;background:inherit;filter:brightness(.9)}
+.tbl:before{top:-7px}.tbl:after{bottom:-7px}
+.t-av{background:#bfe8ca;color:#16643a}.t-rs{background:#f6b26b;color:#7a3e00}.t-oc{background:#f3a5a5;color:#8a1f1f}
+.tbl.sel{border-color:var(--navy);box-shadow:0 0 0 3px rgba(11,42,91,.15)}
+.leg{display:flex;justify-content:center;gap:16px;font-size:12px;color:var(--mut);margin:4px 0 14px}
+.dot{width:9px;height:9px;border-radius:50%;display:inline-block;margin-right:5px}
+.chips{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;margin-bottom:12px}
+.chips button{padding:8px 16px;border-radius:20px;background:#fff;border:1px solid var(--line);font-size:12.5px;font-weight:600;white-space:nowrap}
+.chips button.on{background:var(--navy);color:#fff;border-color:var(--navy)}
+.food{display:flex;gap:12px;align-items:center;background:#fff;border:1px solid var(--line);border-radius:12px;padding:10px;margin-bottom:10px;box-shadow:var(--sh)}
+.thumb{width:58px;height:58px;border-radius:10px;display:grid;place-items:center;font-size:27px;background:#f3f6fa;flex:none;overflow:hidden}
+.thumb img{width:100%;height:100%;object-fit:cover;border-radius:inherit;display:block}
+.qty{display:flex;align-items:center;gap:10px;background:#f3f6fa;border-radius:9px;padding:4px 8px;font-weight:700}
+.qty button{font-size:16px;color:var(--navy);width:18px}
+.date-picker{margin-bottom:14px}
+.date-picker label{color:var(--txt)}
+.slot-list{display:grid;gap:8px;max-height:300px;overflow-y:auto;margin:10px 0 14px;padding:2px}
+.slot-option{display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;padding:12px;border:1px solid var(--line);border-radius:10px;background:#fff;text-align:left;font-size:13px}
+.slot-option.selected{border-color:var(--navy);background:#f1f5fb;box-shadow:0 0 0 2px rgba(11,42,91,.1)}
+.slot-option.full{background:#f4f5f7;color:#9aa3af;cursor:not-allowed}
+.slot-state{font-size:11px;font-weight:700;color:var(--gr);white-space:nowrap}
+.slot-option.selected .slot-state{color:var(--navy)}
+.slot-option.full .slot-state{color:var(--rd)}
+.tbl:disabled{opacity:.48;cursor:not-allowed}
+button:disabled{cursor:not-allowed;opacity:.5}
+/* ---------- admin ---------- */
+.adm{display:grid;grid-template-columns:238px minmax(0,1fr);min-height:100vh;min-width:0}
+.side{background:var(--navy);color:#fff;padding:18px 12px;position:sticky;top:0;height:100vh;overflow-y:auto}
+.brand{display:flex;gap:10px;align-items:center;padding:0 8px 16px;border-bottom:1px solid rgba(255,255,255,.14);margin-bottom:12px}
+.crest{width:38px;height:38px;border-radius:9px;background:var(--gold);color:var(--navy);display:grid;place-items:center;font-weight:800;font-size:13px;flex:none}
+.side button{display:flex;gap:10px;align-items:center;width:100%;padding:10px 12px;border-radius:9px;font-size:13.5px;color:#cfdaec;margin-bottom:2px}
+.side button.on,.side button:hover{background:rgba(255,255,255,.12);color:#fff}
+.main{padding:0 0 40px}
+.topbar{background:#fff;border-bottom:1px solid var(--line);padding:16px 26px;display:flex;align-items:center;gap:16px;position:sticky;top:0;z-index:5;min-width:0}
+.topbar h1{font-size:19px;font-weight:700}
+.topbar input{width:auto;max-width:280px;min-width:0;flex:0 1 280px;margin-left:auto}
+.wrap{padding:22px 26px;min-width:0}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(168px,1fr));gap:14px;margin-bottom:18px}
+.stat{background:#fff;border:1px solid var(--line);border-left:4px solid var(--navy);border-radius:12px;padding:14px 16px;box-shadow:var(--sh)}
+.stat b{display:block;font-size:25px;margin-top:4px}
+.cols{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:16px;align-items:start}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{text-align:left;color:var(--mut);font-size:11.5px;text-transform:uppercase;letter-spacing:.4px;padding:9px 10px;border-bottom:1px solid var(--line)}
+td{padding:11px 10px;border-bottom:1px solid #f1f4f8}
+tr:last-child td{border:0}
+.bar{height:9px;border-radius:5px;background:#e8edf5;overflow:hidden;margin-top:6px}
+.bar i{display:block;height:100%;background:var(--navy)}
+.gridc{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:14px}
+.chart{display:flex;align-items:flex-end;gap:14px;height:180px;padding-top:10px}
+.chart div{flex:1;background:linear-gradient(180deg,var(--navy2),var(--navy));border-radius:7px 7px 0 0;position:relative;text-align:center}
+.chart div span{position:absolute;bottom:-20px;left:0;right:0;font-size:11px;color:var(--mut)}
+.chart div b{position:absolute;top:-19px;left:0;right:0;font-size:11px;color:var(--navy)}
+.frm{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(230px,100%),1fr));gap:14px}
+label{display:block;font-size:12px;font-weight:600;color:var(--mut);margin-bottom:5px}
+.t-ds{background:#e4e7eb;color:#8a94a3}
+.modalbg{position:fixed;inset:0;background:rgba(11,20,35,.5);z-index:90;display:flex;align-items:center;justify-content:center;padding:20px}
+.modalbox{background:#fff;border-radius:16px;padding:22px;width:100%;max-width:420px;max-height:86vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+.modalbox h3{font-size:16px;margin-bottom:14px}
+.mrow{display:flex;gap:10px;margin-top:16px}
+.mrow .btn{width:auto;flex:1}
+@media(max-width:860px){.adm{grid-template-columns:minmax(0,1fr)}.side{position:sticky;top:0;z-index:6;height:auto;display:flex;align-items:center;gap:4px;overflow-x:auto;overflow-y:hidden;padding:8px}.brand{flex:0 0 auto;padding:0 8px 0 0;margin:0;border:0}.side>button{flex:0 0 auto;width:auto;white-space:nowrap;margin:0;padding:9px 10px}.side>button:last-child{margin-top:0!important}.cols{grid-template-columns:minmax(0,1fr)}}
+@media(max-width:600px){.topbar{padding:12px 14px;gap:10px;flex-wrap:wrap}.topbar h1{flex:1 1 100%}.topbar input{order:3;flex:1 1 100%;width:100%;max-width:none;margin-left:0}.wrap{padding:14px 12px}.stats{grid-template-columns:repeat(auto-fit,minmax(min(168px,100%),1fr))}.frm{grid-template-columns:minmax(0,1fr)}.row{flex-wrap:wrap}.leg{flex-wrap:wrap;gap:8px}.grid4{grid-template-columns:repeat(2,minmax(0,1fr))}.card{min-width:0;padding:14px}table{display:block;max-width:100%;overflow-x:auto;white-space:nowrap}.mrow{flex-wrap:wrap}.mrow .btn{min-width:120px}}
+@media(max-width:430px){.phone{width:100%;margin:0;border-radius:0;height:100vh;height:100dvh;max-height:100vh;max-height:100dvh}.authwrap{padding:14px}.authtabs button{padding:9px 14px}}
+</style></head><body>
+<div id="app"></div>
+<script>
+const P=n=>"₱"+n.toFixed(2);
+const localDateInput=()=>new Date(Date.now()-new Date().getTimezoneOffset()*60000).toISOString().slice(0,10);
+const S={role:'s',loggedIn:false,view:'login',tab:'home',apage:'dash',sel:null,resSel:null,resDate:localDateInput(),resSlot:null,cat:'All',checked:true,left:1200,menuOpen:false,notifOpen:false,
+ user:{name:"Juan Dela Cruz",id:"2023-161302",email:"jdelacruz@nu-baliwag.edu.ph",phone:"0917 555 0148"},
+ tables:[...Array(12)].map((_,i)=>({n:i+1,seats:i%3==2?6:4,loc:(i+1)%2?"Near Stalls":"Window Side",st:[7,12].includes(i+1)?"oc":"av"})),
+ menu:[
+  {id:1,n:"Chicken Inasal",p:120,c:"Main Courses",e:"🍗",av:1,s:20,min:5,unit:"servings"},
+  {id:2,n:"Pork Sisig",p:110,c:"Main Courses",e:"🥘",av:1,s:18,min:5,unit:"servings"},
+  {id:3,n:"Carbonara",p:130,c:"Main Courses",e:"🍝",av:1,s:16,min:4,unit:"servings"},
+  {id:4,n:"Fries",p:120,c:"Side Courses",e:"🍟",av:1,s:15,min:4,unit:"servings"},
+  {id:5,n:"Bicol Express",p:135,c:"Main Courses",e:"🌶️",av:1,s:12,min:3,unit:"servings"},
+  {id:6,n:"Pork Steak",p:145,c:"Main Courses",e:"🥩",av:1,s:14,min:4,unit:"servings"},
+  {id:7,n:"Bread with Peanut Butter",p:45,c:"Side Courses",e:"🥪",av:1,s:25,min:5,unit:"pieces"},
+  {id:8,n:"Bread with Nutella",p:50,c:"Side Courses",e:"🍞",av:1,s:24,min:5,unit:"pieces"},
+  {id:9,n:"Bread with Strawberry Jam",p:48,c:"Side Courses",e:"🍓",av:1,s:22,min:5,unit:"pieces"},
+  {id:10,n:"Bottled Water",p:25,c:"Beverages",e:"💧",av:1,s:40,min:10,unit:"pieces"},
+  {id:11,n:"Smart C",p:30,c:"Beverages",e:"🥤",av:1,s:35,min:10,unit:"pieces"},
+  {id:12,n:"Yakult",p:35,c:"Beverages",e:"🥤",av:1,s:30,min:10,unit:"pieces"},
+  {id:13,n:"Combi",p:20,c:"Biscuits & Snacks",e:"🍪",av:1,s:50,min:10,unit:"pieces"},
+  {id:14,n:"SkyFlakes",p:22,c:"Biscuits & Snacks",e:"🧁",av:1,s:48,min:10,unit:"pieces"},
+  {id:15,n:"Oreo",p:25,c:"Biscuits & Snacks",e:"🍫",av:1,s:42,min:10,unit:"pieces"},
+  {id:16,n:"Dewberry",p:18,c:"Biscuits & Snacks",e:"🫐",av:1,s:45,min:10,unit:"pieces"},
+  {id:17,n:"Turon",p:35,c:"Side Courses",e:"🍌",av:1,s:20,min:5,unit:"pieces"},
+  {id:18,n:"Beef Tapsilog",p:130,c:"Main Courses",e:"🍳",av:1,s:16,min:4,unit:"servings"},
+  {id:19,n:"Iced Coffee",p:60,c:"Beverages",e:"🧋",av:1,s:24,min:5,unit:"cups"}
+ ],
+ cart:{},
+ res:[{id:"RSV-1041",n:"Chen Dred",sid:"2023-10011",t:5,s:4,tm:"Sep 20, 11:30 AM",ci:"Pending",st:"Confirmed"},{id:"RSV-1042",n:"Mary Jane",sid:"2022-09877",t:8,s:4,tm:"Sep 20, 11:35 AM",ci:"Pending",st:"Confirmed"},{id:"RSV-1043",n:"Juan Dela Cruz",sid:"2023-10456",t:12,s:4,tm:"Sep 20, 11:40 AM",ci:"Checked-in",st:"Active"},{id:"RSV-1044",n:"Alex Santos",sid:"2021-08123",t:3,s:4,tm:"Sep 19, 10:50 AM",ci:"No show",st:"Expired"}],
+ ord:[{id:"ORD-2201",n:"Juan Dela Cruz",t:12,it:"Chicken Inasal ×1, Iced Coffee ×1, Pork Sisig ×1",tot:290,tm:"Sep 20, 11:41 AM",st:"Preparing"},{id:"ORD-2202",n:"Mary Jane",t:8,it:"Beef Tapsilog ×2",tot:260,tm:"Sep 20, 11:36 AM",st:"Pending"},{id:"ORD-2203",n:"Chen Dred",t:5,it:"Turon ×3, Iced Coffee ×2",tot:225,tm:"Sep 20, 11:31 AM",st:"Ready"},{id:"ORD-2204",n:"Alex Santos",t:3,it:"Pork Sisig ×1",tot:110,tm:"Sep 19, 10:52 AM",st:"Completed"}],
+ ann:[{t:"Canteen will close at 6:00 PM today.",d:"Please manage your dining time.",w:"Today"},{t:"New menu items this week",d:"Bulalo and Halo-halo now available.",w:"Sep 16"},{t:"Reservation reminder",d:"Check in within 15 minutes or your table is released.",w:"Sep 15"}],
+ users:[{n:"Juan Dela Cruz",sid:"2023-10456",em:"jdelacruz@nu-baliwag.edu.ph",res:18,ord:24,active:1},{n:"Mary Jane",sid:"2022-09877",em:"maryjane@nu-baliwag.edu.ph",res:11,ord:15,active:1},{n:"Chen Dred",sid:"2023-10011",em:"chendred@nu-baliwag.edu.ph",res:7,ord:9,active:1},{n:"Alex Santos",sid:"2021-08123",em:"alexsantos@nu-baliwag.edu.ph",res:3,ord:4,active:0}],
+ modal:null,showDoneOrders:false,tableLocationLayoutVersion:0,
+ resFilter:{q:"",status:"All"},repFilter:"This Week",menuQuery:"",
+ settings:{name:"NU Baliwag Canteen",hrs:"7:00 AM – 6:00 PM",contact:"(044) 123-4567",email:"canteen@nu-baliwag.edu.ph",maxDur:20,maxSeats:6,ciDeadline:15,cancelWin:10,numTables:12,cap:4,locs:"Near Stalls, Center Aisle, Window Side",preorder:"Enabled",prepTime:12,cutoff:"5:30 PM",notifRes:1,notifOrd:1,notifInv:1},
+ activeOrder:null,activeRes:null,ordSeq:2205,timerStarted:false,payMethod:"GCash",paying:false,annForm:{t:"",d:"",type:"General",w:""},annEdit:null};
+const RESTORABLE_MENU_ITEMS=S.menu.filter(item=>item.c=="Side Courses"||item.c=="Biscuits & Snacks"||["Beef Tapsilog","Iced Coffee"].includes(item.n)).map(item=>({...item}));
+const DB_KEY="nuCanteenDB",SHARED=['tables','ord','res','menu','ann','users','ordSeq','settings','tableLocationLayoutVersion'];
+const MENU_IMAGE_PATHS={"Combi":"assets/menu/combi.jpeg","Bottled Water":"assets/menu/water.jpeg","Pork Sisig":"assets/menu/pork-sisig.jpeg","Dewberry":"assets/menu/dewberry.jpeg","Smart C":"assets/menu/smart-c.jpeg","SkyFlakes":"assets/menu/skyflakes.jpeg","Oreo":"assets/menu/oreo.jpeg","Bread with Nutella":"assets/menu/bread-nutella.jpeg","Bread with Peanut Butter":"assets/menu/bread-peanut-butter.jpeg","Bread with Strawberry Jam":"assets/menu/bread-strawberry-jam.jpeg","Fries":"assets/menu/fries.jpeg","Yakult":"assets/menu/yakult.jpeg","Chicken Inasal":"assets/menu/chicken-inasal.jpeg","Carbonara":"assets/menu/carbonara.jpeg","Bicol Express":"assets/menu/bicol-express.jpeg","Pork Steak":"assets/menu/pork-steak.jpeg","Turon":"assets/menu/turon.jpeg","Beef Tapsilog":"assets/menu/beef-tapsilog.jpeg","Iced Coffee":"assets/menu/iced-coffee.jpeg"};
+const loadDB=()=>{try{const raw=localStorage.getItem(DB_KEY);if(raw)Object.assign(S,JSON.parse(raw))}catch(e){}};
+const saveDB=()=>{try{const d={};SHARED.forEach(k=>d[k]=S[k]);localStorage.setItem(DB_KEY,JSON.stringify(d))}catch(e){}};
+loadDB();
+const MENU_RENAMES={"Fried Chicken":{n:"Chicken Inasal",e:"🍗",c:"Main Courses"},"Spaghetti":{n:"Fries",e:"🍟",c:"Side Courses"},"Pocari Sweat":{n:"Yakult",e:"🥤",c:"Beverages"},"Sisig":{n:"Pork Sisig",e:"🥘",c:"Main Courses"},"Water":{n:"Bottled Water",e:"💧",c:"Beverages"}};
+S.menu.forEach(item=>{const replacement=MENU_RENAMES[item.n];if(replacement)Object.assign(item,replacement)});
+S.menu.forEach(item=>{if(MENU_IMAGE_PATHS[item.n])item.image=MENU_IMAGE_PATHS[item.n]});
+if(S.tableLocationLayoutVersion<1){
+ S.tables.forEach(table=>{const number=Number(table.n);if(number>=1&&number<=12)table.loc=number%2?"Near Stalls":"Window Side"});
+ S.tableLocationLayoutVersion=1;
+}
+const restoreMenuItems=()=>{
+ let nextId=Math.max(0,...S.menu.map(item=>Number(item.id)||0))+1;
+ RESTORABLE_MENU_ITEMS.forEach(item=>{
+  const existing=S.menu.find(current=>current.n.trim().toLowerCase()==item.n.trim().toLowerCase());
+  if(existing){existing.c=item.c;return;}
+  S.menu.push({...item,id:nextId++});
+ });
+};
+restoreMenuItems();
+S.menu.forEach(item=>{if(MENU_IMAGE_PATHS[item.n])item.image=MENU_IMAGE_PATHS[item.n]});
+S.settings.maxDur=20;
+window.addEventListener('storage',e=>{if(e.key==DB_KEY&&e.newValue){try{Object.assign(S,JSON.parse(e.newValue));r()}catch(err){}}});
+const stName={av:"Available",rs:"Reserved",oc:"Occupied",ds:"Disabled"},stCls={av:"b-g",rs:"b-res",oc:"b-r",ds:"b-n"},tCls={av:"t-av",rs:"t-rs",oc:"t-oc",ds:"t-ds"};
+const STALLS=[
+ {n:1,e:"🥪",t:"Side Courses",products:["Turon","Bread with Peanut Butter","Bread with Nutella","Bread with Strawberry Jam"]},
+ {n:2,e:"🥤",t:"Beverages & Biscuits",products:["Bottled Water","Iced Coffee","Smart C","Yakult","Combi","SkyFlakes","Oreo","Dewberry"]},
+ {n:3,e:"🍗",t:"Main Courses",products:["Chicken Inasal","Pork Sisig","Beef Tapsilog","Carbonara","Bicol Express","Pork Steak"]}
+ ];
+const stallsRow=`<div class="stalls">${STALLS.map(s=>`<div class="stall"><span>${s.e}</span><b>Stall ${s.n}</b><small>${s.t}</small></div>`).join("")}</div>`;
+const findMenuItem=(id)=>S.menu.find(m=>m.id===Number(id));
+const menuThumb=item=>item.image?`<img src="${item.image}" alt="${item.n}">`:item.e;
+const findMenuItemByName=(name)=>S.menu.find(m=>m.n.toLowerCase()===String(name||'').trim().toLowerCase());
+const studentOrders=()=>S.ord.filter(o=>o.sid===S.user.id);
+const MENU_CATEGORIES=["All","Main Courses","Side Courses","Beverages","Biscuits & Snacks"];
+const MENU_CATEGORY_MIGRATIONS={Meals:"Main Courses",Snacks:"Biscuits & Snacks",Drinks:"Beverages"};
+S.menu.forEach(item=>{if(MENU_CATEGORY_MIGRATIONS[item.c])item.c=MENU_CATEGORY_MIGRATIONS[item.c]});
+const RESERVATION_SLOT_START=660,RESERVATION_SLOT_END=1080,RESERVATION_SLOT_MINUTES=20;
+const reservationSlots=()=>Array.from({length:(RESERVATION_SLOT_END-RESERVATION_SLOT_START)/RESERVATION_SLOT_MINUTES},(_,i)=>RESERVATION_SLOT_START+i*RESERVATION_SLOT_MINUTES);
+const formatSlotTime=minutes=>{const hour=Math.floor(minutes/60),minute=minutes%60,period=hour==12&&minute==0?"NN":hour<12?"AM":"PM";return `${hour%12||12}:${String(minute).padStart(2,"0")} ${period}`};
+const reservationSlotLabel=slot=>{const start=Number(slot);return `${formatSlotTime(start)} - ${formatSlotTime(start+RESERVATION_SLOT_MINUTES)}`};
+const formatReservationDate=value=>value?new Date(`${value}T12:00:00`).toLocaleDateString("en-US",{month:"long",day:"numeric",year:"numeric"}):"Select a date";
+const reservationOrder=reservation=>S.ord.find(order=>order.resId==reservation.id||reservation.orderId==order.id);
+const reservationStatus=reservation=>{
+ if(!reservation)return "Reserved";
+ if(reservation.st=="Completed")return "Completed";
+ const order=reservationOrder(reservation);
+ if(reservation.st=="Occupied"||reservation.st=="Serving"||order?.st=="Completed")return "Occupied";
+ if(["Cancelled","Expired","No show"].includes(reservation.st))return reservation.st;
+ return "Reserved";
+};
+const reservationBadgeClass=status=>status=="Occupied"?"b-r":status=="Reserved"?"b-res":status=="Expired"||status=="Cancelled"?"b-r":"b-n";
+const isReservationActive=reservation=>["Reserved","Active","Confirmed","Occupied","Serving"].includes(reservationStatus(reservation));
+const reservationsForSlot=(date,slot,tableNumber)=>S.res.filter(reservation=>reservation.date==date&&String(reservation.slot)==String(slot)&&(!tableNumber||Number(reservation.t)==Number(tableNumber))&&isReservationActive(reservation));
+const isSlotFull=(date,slot)=>{const tables=S.tables.filter(table=>table.st!="ds");return !tables.length||tables.every(table=>reservationsForSlot(date,slot,table.n).length>0)};
+const tableStatusForSlot=(table,date=S.resDate,slot=S.resSlot)=>{
+ if(table.st=="ds")return "ds";
+ if(!slot)return table.st;
+ const reservations=reservationsForSlot(date,slot,table.n);
+ if(reservations.some(reservation=>reservationStatus(reservation)=="Occupied"))return "oc";
+ return reservations.length?"rs":"av";
+};
+const syncTableStatus=tableNumber=>{
+ const table=S.tables.find(item=>Number(item.n)==Number(tableNumber));
+ if(!table||table.st=="ds")return;
+ const reservations=S.res.filter(reservation=>Number(reservation.t)==Number(tableNumber)&&isReservationActive(reservation));
+ table.st=reservations.some(reservation=>reservationStatus(reservation)=="Occupied")?"oc":reservations.length?"rs":"av";
+};
+const finishDiningTimer=()=>{
+ if(!S.timerStarted && S.left===0) return;
+ const order=S.ord.find(item=>item.id==S.activeOrder);
+ const reservation=S.res.find(item=>item.id==S.activeRes||item.id==order?.resId||item.orderId==order?.id);
+ if(reservation)reservation.st="Completed";
+ const tableNumber=reservation?.t??order?.t??S.sel;
+ if(tableNumber!=null)syncTableStatus(tableNumber);
+ S.left=0;
+ S.timerStarted=false;
+ r();
+};
+S.tables.forEach(table=>syncTableStatus(table.n));
+const cnt=k=>S.tables.filter(t=>t.st==k).length;
+const total=()=>Object.entries(S.cart).reduce((a,[id,q])=>{const item=findMenuItem(id);return a+(item?item.p*q:0);},0);
+const fmt=s=>String(Math.floor(s/3600)).padStart(2,"0")+":"+String(Math.floor(s%3600/60)).padStart(2,"0")+":"+String(s%60).padStart(2,"0");
+const go=(v,x)=>{if(x!==undefined)S.sel=x;if(v=='reserve'){S.resSlot=null;S.resSel=null}S.view=v;S.menuOpen=false;S.notifOpen=false;if(['home','reserve','orders','profile'].includes(v))S.tab=v;r()};
+const toggleMenu=()=>{S.menuOpen=!S.menuOpen;S.notifOpen=false;r()};
+const toggleNotif=()=>{S.notifOpen=!S.notifOpen;S.menuOpen=false;r()};
+const notifList=()=>{const list=[];const o=S.ord.find(x=>x.id==S.activeOrder);
+ if(o)list.push({ic:o.st=='Ready'?'✅':o.st=='Completed'?'🍽️':o.st=='Cancelled'?'⚠️':'👨‍🍳',t:`Order ${o.id} is now ${o.st}`,w:'Just now'});
+ S.ann.slice(0,3).forEach(a=>list.push({ic:'📣',t:a.t,w:a.w}));
+ return list;};
+const loginAs=role=>{S.loggedIn=true;S.role=role;if(role=='s'){S.view='home';S.tab='home'}else{S.apage='dash'}r()};
+const logout=()=>{S.loggedIn=false;r()};
+const updateStallQty=(stallId,itemId,delta)=>{
+ if(!S.stallQty)S.stallQty={};
+ if(!S.stallQty[stallId])S.stallQty[stallId]={};
+ const current=Number(S.stallQty[stallId][itemId]||1);
+ S.stallQty[stallId][itemId]=Math.max(1,current+delta);
+ r();
+};
+const addItemToCart=(itemId,quantity=1)=>{
+ const item=findMenuItem(itemId);
+ if(!item)return;
+ const qtyToAdd=Number(quantity)||1;
+ if(item.s<=0||qtyToAdd<=0)return;
+ const currentQty=S.cart[item.id]||0;
+ if(currentQty+qtyToAdd>item.s){
+  const maxAllowed=Math.max(0,item.s-currentQty);
+  if(maxAllowed<=0){item.av=0;return;}
+  S.cart[item.id]=item.s;
+  r(true);
+  return;
+ }
+ S.cart[item.id]=currentQty+qtyToAdd;
+ r(true);
+};
+const qty=(id,d)=>{
+ const item=findMenuItem(id);
+ if(!item)return;
+ const currentQty=S.cart[id]||0;
+ const nextQty=currentQty+d;
+ if(d>0 && nextQty>item.s)return;
+ if(nextQty<1){delete S.cart[id];r(true);return;}
+ S.cart[id]=nextQty;
+ r(true);
+};
+const setStatus=(n,st)=>{S.tables.find(t=>t.n==n).st=st;r()};
+const deductInventoryForOrder=(orderCart={})=>{
+ Object.entries(orderCart).forEach(([id,quantity])=>{
+  const item=findMenuItem(id);
+  if(!item)return;
+  item.s=Math.max(0,item.s-Number(quantity));
+  item.av=item.s>0?1:0;
+ });
+};
+const setOrd=(id,st)=>{const o=S.ord.find(x=>x.id==id);if(!o)return;const wasCompleted=o.st=='Completed';o.st=st;
+ if(st=='Completed'&&!wasCompleted&&o.cart&&!o.inventoryDeducted){deductInventoryForOrder(o.cart);o.inventoryDeducted=true;}
+ const reservation=S.res.find(item=>item.id==o.resId||item.orderId==o.id);
+ if(reservation){if(st=='Completed')reservation.st='Occupied';syncTableStatus(reservation.t)}else syncTableStatus(o.t);
+ if(id==S.activeOrder&&st=='Completed'&&!S.timerStarted){S.left=1200;S.timerStarted=true}r()};
+const checkin=id=>{const reservation=S.res.find(item=>item.id==id);if(!reservation)return;reservation.ci="Checked-in";reservation.st=reservationStatus(reservation);syncTableStatus(reservation.t);r()};
+const nowStr=()=>new Date().toLocaleString([], {month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'});
+const confirmOrder=n=>{
+ if(!S.resDate||!S.resSlot||S.resDate<localDateInput()){
+  alert('Select a reservation date and time slot before confirming.');
+  go('reserve');
+  return;
+ }
+ const invalidItems=Object.entries(S.cart).filter(([id,qty])=>{
+  const item=findMenuItem(id);
+  return !item || item.s<=0 || Number(qty)>item.s;
+ });
+ if(invalidItems.length){
+  alert('One or more items are out of stock. Please remove them before completing the order.');
+  return;
+ }
+ const items=Object.entries(S.cart).map(([id,q])=>`${findMenuItem(id).n} ×${q}`).join(", ")||"No pre-order";
+ let reservation=S.res.find(item=>item.id==S.activeRes&&item.date==S.resDate&&String(item.slot)==String(S.resSlot)&&Number(item.t)==Number(n)&&isReservationActive(item));
+ if(!reservation)reservation=S.res.find(item=>item.sid==S.user.id&&Number(item.t)==Number(n)&&item.date==S.resDate&&String(item.slot)==String(S.resSlot)&&isReservationActive(item));
+ if(!reservation){
+  if(isSlotFull(S.resDate,S.resSlot)||reservationsForSlot(S.resDate,S.resSlot,n).length){
+   alert('That table or time slot is no longer available. Please choose another.');
+   go('reserve');
+   return;
+  }
+  reservation={id:"RSV-"+(S.ordSeq++),n:S.user.name,sid:S.user.id,t:n,s:S.tables.find(x=>x.n==n).seats,tm:`${formatReservationDate(S.resDate)} · ${reservationSlotLabel(S.resSlot)}`,date:S.resDate,slot:String(S.resSlot),ci:"Pending",st:"Reserved"};
+  S.res.unshift(reservation);
+ }
+ const orderId="ORD-"+(S.ordSeq++);
+ const orderCart={...S.cart};
+ reservation.orderId=orderId;
+ S.ord.unshift({id:orderId,resId:reservation.id,n:S.user.name,sid:S.user.id,t:n,it:items,tot:total(),tm:nowStr(),st:"Pending",cart:orderCart,inventoryDeducted:false});
+ S.activeOrder=orderId;S.activeRes=reservation.id;S.sel=n;S.cart={};S.left=1200;S.timerStarted=false;syncTableStatus(n);go('mine');
+};
+const reserveTable=n=>{
+ const table=S.tables.find(x=>x.n==n);
+ if(!table||table.st=='ds'||!S.resDate||!S.resSlot||S.resDate<localDateInput()||isSlotFull(S.resDate,S.resSlot)||reservationsForSlot(S.resDate,S.resSlot,n).length)return;
+ const rid="RSV-"+(S.ordSeq++);
+ S.res.unshift({id:rid,n:S.user.name,sid:S.user.id,t:n,s:table.seats,tm:`${formatReservationDate(S.resDate)} · ${reservationSlotLabel(S.resSlot)}`,date:S.resDate,slot:String(S.resSlot),ci:"Pending",st:"Reserved"});
+ syncTableStatus(n);S.activeOrder=null;S.activeRes=rid;S.sel=n;S.resSel=null;S.left=1200;S.timerStarted=false;go('menu',n);
+};
+const payAndConfirm=n=>{
+ if(S.payMethod=='Cash'){confirmOrder(n);return}
+ S.paying=true;r();setTimeout(()=>{S.paying=false;confirmOrder(n)},1300);
+};
+const cancelReservation=n=>{
+ const o=S.ord.find(x=>x.id==S.activeOrder);if(o&&o.st!='Completed')o.st='Cancelled';
+ const rr=S.res.find(x=>x.id==S.activeRes);if(rr){rr.st='Cancelled';rr.ci='Cancelled'}
+ syncTableStatus(n);S.activeOrder=null;S.activeRes=null;S.sel=null;S.timerStarted=false;go('home')};
+const annField=(k,v)=>{S.annForm[k]=v};
+const annPublish=()=>{
+ if(!S.annForm.t.trim())return;
+ const entry={t:S.annForm.t,d:S.annForm.d,w:S.annForm.w||"Just now"};
+ if(S.annEdit!==null){S.ann[S.annEdit]=entry;S.annEdit=null}else{S.ann.unshift(entry)}
+ S.annForm={t:"",d:"",type:"General",w:""};r();
+};
+const annEditStart=i=>{S.annForm={t:S.ann[i].t,d:S.ann[i].d,type:"General",w:S.ann[i].w};S.annEdit=i;r()};
+const annDelete=i=>{S.ann.splice(i,1);if(S.annEdit==i)S.annEdit=null;r()};
+const annCancelEdit=()=>{S.annForm={t:"",d:"",type:"General",w:""};S.annEdit=null;r()};
 
-  <!-- Google Font used throughout the interface. -->
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link
-    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
-    rel="stylesheet"
-  >
+/* ---- generic modal ---- */
+const openModal=(type,data)=>{S.modal={type,f:{...data}};r()};
+const closeModal=()=>{S.modal=null;r()};
+const mset=(k,v)=>{S.modal.f[k]=v};
 
-  <style>
-    :root {
-      --navy:#0B2A5B;
-      --navy2:#123a76;
-      --gold:#F0B323;
-      --bg:#eef1f5;
-      --card:#fff;
-      --line:#e3e8ef;
-      --txt:#152238;
-      --mut:#6b7a90;
-      --gr:#2e9e5b;
-      --grb:#d9f0e1;
-      --or:#f0b323;
-      --orb:#fdf2d6;
-      --rd:#d94b4b;
-      --rdb:#fbe0e0;
-      --r:14px;
-      --sh:0 2px 10px rgba(11,42,91,.08);
-    }
-    * {
-      box-sizing:border-box;
-      margin:0;
-      padding:0;
-    }
-    body {
-      font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;
-      background:var(--bg);
-      color:var(--txt);
-      -webkit-font-smoothing:antialiased;
-    }
-    button {
-      font:inherit;
-      cursor:pointer;
-      border:0;
-      background:none;
-      color:inherit;
-    }
-    input,select,textarea {
-      font:inherit;
-      width:100%;
-      padding:11px 13px;
-      border:1px solid var(--line);
-      border-radius:10px;
-      background:#fff;
-      color:var(--txt);
-      outline:none;
-    }
-    input:focus,select:focus {
-      border-color:var(--navy2);
-    }
-    #switch {
-      position:fixed;
-      right:14px;
-      bottom:14px;
-      z-index:99;
-      background:var(--navy);
-      color:#fff;
-      border-radius:30px;
-      padding:6px;
-      display:flex;
-      gap:4px;
-      box-shadow:0 6px 20px rgba(0,0,0,.25);
-    }
-    #switch button {
-      padding:8px 16px;
-      border-radius:24px;
-      font-size:13px;
-      font-weight:600;
-      opacity:.65;
-    }
-    #switch button.on {
-      background:#fff;
-      color:var(--navy);
-      opacity:1;
-    }
-    /* ---------- student ---------- */
-    .phone {
-      width:390px;
-      margin:24px auto;
-      background:#fff;
-      border-radius:26px;
-      overflow:hidden;
-      box-shadow:0 18px 50px rgba(11,42,91,.22);
-      display:flex;
-      flex-direction:column;
-      height:820px;
-      max-height:calc(100vh - 48px);
-      position:relative;
-    }
-    .backdrop {
-      position:absolute;
-      inset:0;
-      background:rgba(11,20,35,.4);
-      z-index:20;
-    }
-    .drawer {
-      position:absolute;
-      top:0;
-      bottom:0;
-      left:0;
-      width:76%;
-      max-width:280px;
-      background:#fff;
-      z-index:21;
-      padding:20px 14px;
-      display:flex;
-      flex-direction:column;
-      box-shadow:8px 0 26px rgba(0,0,0,.18);
-    }
-    .dhead {
-      display:flex;
-      gap:10px;
-      align-items:center;
-      padding-bottom:16px;
-      border-bottom:1px solid var(--line);
-      margin-bottom:10px;
-    }
-    .drawer nav {
-      display:flex;
-      flex-direction:column;
-      gap:2px;
-    }
-    .drawer nav button {
-      padding:12px 10px;
-      border-radius:9px;
-      text-align:left;
-      font-weight:600;
-      font-size:13.5px;
-      color:var(--txt);
-    }
-    .drawer nav button:hover {
-      background:#f3f6fa;
-    }
-    .notifpanel {
-      position:absolute;
-      top:64px;
-      right:12px;
-      width:250px;
-      max-height:340px;
-      overflow-y:auto;
-      background:#fff;
-      border-radius:14px;
-      box-shadow:0 12px 34px rgba(0,0,0,.2);
-      z-index:21;
-      padding:12px;
-    }
-    .nitem {
-      display:flex;
-      gap:9px;
-      padding:9px 4px;
-      border-bottom:1px solid var(--line);
-    }
-    .nitem:last-child {
-      border:0;
-    }
-    .sbody {
-      flex:1;
-      overflow-y:auto;
-      background:var(--bg);
-      padding:14px;
-    }
-    .shead {
-      background:var(--navy);
-      color:#fff;
-      padding:16px;
-      display:flex;
-      align-items:center;
-      gap:12px;
-    }
-    .shead h2 {
-      font-size:16px;
-      font-weight:600;
-      flex:1;
-      text-align:center;
-    }
-    .ic {
-      width:34px;
-      height:34px;
-      border-radius:9px;
-      display:grid;
-      place-items:center;
-      font-size:17px;
-    }
-    .shead .ic {
-      background:rgba(255,255,255,.12);
-    }
-    .card {
-      background:var(--card);
-      border:1px solid var(--line);
-      border-radius:var(--r);
-      box-shadow:var(--sh);
-      padding:16px;
-      margin-bottom:14px;
-    }
-    .ttl {
-      font-size:13px;
-      font-weight:700;
-      color:var(--mut);
-      letter-spacing:.3px;
-      margin-bottom:10px;
-      text-transform:uppercase;
-    }
-    .btn {
-      background:var(--navy);
-      color:#fff;
-      padding:13px;
-      border-radius:11px;
-      font-weight:700;
-      width:100%;
-      letter-spacing:.4px;
-    }
-    .btn.g {
-      background:#fff;
-      color:var(--navy);
-      border:1px solid var(--navy);
-    }
-    .btn.d {
-      background:#fff;
-      color:var(--rd);
-      border:1px solid var(--rd);
-    }
-    .btn.sm {
-      width:auto;
-      padding:8px 14px;
-      font-size:12.5px;
-      border-radius:9px;
-      font-weight:600;
-    }
-    .row {
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      gap:10px;
-    }
-    .mut {
-      color:var(--mut);
-      font-size:12.5px;
-    }
-    .badge {
-      font-size:11px;
-      font-weight:700;
-      padding:5px 10px;
-      border-radius:20px;
-      white-space:nowrap;
-    }
-    .b-g {
-      background:var(--grb);
-      color:var(--gr);
-    }
-    .b-o {
-      background:var(--orb);
-      color:#9a6b00;
-    }
-    .b-r {
-      background:var(--rdb);
-      color:var(--rd);
-    }
-    .b-n {
-      background:#e8edf5;
-      color:var(--navy);
-    }
-    .timer {
-      font-size:34px;
-      font-weight:800;
-      color:var(--gr);
-      letter-spacing:1px;
-      text-align:center;
-    }
-    .qa {
-      display:grid;
-      grid-template-columns:repeat(3,1fr);
-      gap:10px;
-    }
-    .qa div {
-      background:#fff;
-      border:1px solid var(--line);
-      border-radius:12px;
-      padding:14px 6px;
-      text-align:center;
-      font-size:11.5px;
-      font-weight:600;
-      box-shadow:var(--sh);
-    }
-    .qa span {
-      display:block;
-      font-size:22px;
-      margin-bottom:6px;
-    }
-    .bnav {
-      display:flex;
-      background:#fff;
-      border-top:1px solid var(--line);
-    }
-    .bnav button {
-      flex:1;
-      padding:10px 0 12px;
-      font-size:10.5px;
-      color:var(--mut);
-      font-weight:600;
-    }
-    .bnav button span {
-      display:block;
-      font-size:18px;
-      margin-bottom:2px;
-      filter:grayscale(1);
-      opacity:.6;
-    }
-    .bnav button.on {
-      color:var(--navy);
-    }
-    .bnav button.on span {
-      filter:none;
-      opacity:1;
-    }
-    .grid4 {
-      display:grid;
-      grid-template-columns:repeat(4,1fr);
-      gap:12px;
-    }
-    .tbl {
-      border-radius:10px;
-      padding:14px 0;
-      text-align:center;
-      font-weight:800;
-      font-size:15px;
-      border:2px solid transparent;
-      position:relative;
-    }
-    .tbl:before,.tbl:after {
-      content:"";
-      position:absolute;
-      left:22%;
-      right:22%;
-      height:5px;
-      border-radius:3px;
-      background:inherit;
-      filter:brightness(.9);
-    }
-    .tbl:before {
-      top:-7px;
-    }
-    .tbl:after {
-      bottom:-7px;
-    }
-    .t-av {
-      background:#bfe8ca;
-      color:#16643a;
-    }
-    .t-rs {
-      background:#f7cf6b;
-      color:#7a5600;
-    }
-    .t-oc {
-      background:#f3a5a5;
-      color:#8a1f1f;
-    }
-    .tbl.sel {
-      border-color:var(--navy);
-      box-shadow:0 0 0 3px rgba(11,42,91,.15);
-    }
-    .leg {
-      display:flex;
-      justify-content:center;
-      gap:16px;
-      font-size:12px;
-      color:var(--mut);
-      margin:4px 0 14px;
-    }
-    .dot {
-      width:9px;
-      height:9px;
-      border-radius:50%;
-      display:inline-block;
-      margin-right:5px;
-    }
-    .chips {
-      display:flex;
-      gap:8px;
-      overflow-x:auto;
-      padding-bottom:4px;
-      margin-bottom:12px;
-    }
-    .chips button {
-      padding:8px 16px;
-      border-radius:20px;
-      background:#fff;
-      border:1px solid var(--line);
-      font-size:12.5px;
-      font-weight:600;
-      white-space:nowrap;
-    }
-    .chips button.on {
-      background:var(--navy);
-      color:#fff;
-      border-color:var(--navy);
-    }
-    .food {
-      display:flex;
-      gap:12px;
-      align-items:center;
-      background:#fff;
-      border:1px solid var(--line);
-      border-radius:12px;
-      padding:10px;
-      margin-bottom:10px;
-      box-shadow:var(--sh);
-    }
-    .thumb {
-      width:58px;
-      height:58px;
-      border-radius:10px;
-      display:grid;
-      place-items:center;
-      font-size:27px;
-      background:#f3f6fa;
-      flex:none;
-    }
-    .qty {
-      display:flex;
-      align-items:center;
-      gap:10px;
-      background:#f3f6fa;
-      border-radius:9px;
-      padding:4px 8px;
-      font-weight:700;
-    }
-    .qty button {
-      font-size:16px;
-      color:var(--navy);
-      width:18px;
-    }
-    /* ---------- admin ---------- */
-    .adm {
-      display:grid;
-      grid-template-columns:238px 1fr;
-      min-height:100vh;
-    }
-    .side {
-      background:var(--navy);
-      color:#fff;
-      padding:18px 12px;
-      position:sticky;
-      top:0;
-      height:100vh;
-      overflow-y:auto;
-    }
-    .brand {
-      display:flex;
-      gap:10px;
-      align-items:center;
-      padding:0 8px 16px;
-      border-bottom:1px solid rgba(255,255,255,.14);
-      margin-bottom:12px;
-    }
-    .crest {
-      width:38px;
-      height:38px;
-      border-radius:9px;
-      background:var(--gold);
-      color:var(--navy);
-      display:grid;
-      place-items:center;
-      font-weight:800;
-      font-size:13px;
-      flex:none;
-    }
-    .side button {
-      display:flex;
-      gap:10px;
-      align-items:center;
-      width:100%;
-      padding:10px 12px;
-      border-radius:9px;
-      font-size:13.5px;
-      color:#cfdaec;
-      margin-bottom:2px;
-    }
-    .side button.on,.side button:hover {
-      background:rgba(255,255,255,.12);
-      color:#fff;
-    }
-    .main {
-      padding:0 0 40px;
-    }
-    .topbar {
-      background:#fff;
-      border-bottom:1px solid var(--line);
-      padding:16px 26px;
-      display:flex;
-      align-items:center;
-      gap:16px;
-      position:sticky;
-      top:0;
-      z-index:5;
-    }
-    .topbar h1 {
-      font-size:19px;
-      font-weight:700;
-    }
-    .topbar input {
-      max-width:280px;
-      margin-left:auto;
-    }
-    .wrap {
-      padding:22px 26px;
-    }
-    .stats {
-      display:grid;
-      grid-template-columns:repeat(auto-fit,minmax(168px,1fr));
-      gap:14px;
-      margin-bottom:18px;
-    }
-    .stat {
-      background:#fff;
-      border:1px solid var(--line);
-      border-left:4px solid var(--navy);
-      border-radius:12px;
-      padding:14px 16px;
-      box-shadow:var(--sh);
-    }
-    .stat b {
-      display:block;
-      font-size:25px;
-      margin-top:4px;
-    }
-    .cols {
-      display:grid;
-      grid-template-columns:1.25fr 1fr;
-      gap:16px;
-      align-items:start;
-    }
-    table {
-      width:100%;
-      border-collapse:collapse;
-      font-size:13px;
-    }
-    th {
-      text-align:left;
-      color:var(--mut);
-      font-size:11.5px;
-      text-transform:uppercase;
-      letter-spacing:.4px;
-      padding:9px 10px;
-      border-bottom:1px solid var(--line);
-    }
-    td {
-      padding:11px 10px;
-      border-bottom:1px solid #f1f4f8;
-    }
-    tr:last-child td {
-      border:0;
-    }
-    .bar {
-      height:9px;
-      border-radius:5px;
-      background:#e8edf5;
-      overflow:hidden;
-      margin-top:6px;
-    }
-    .bar i {
-      display:block;
-      height:100%;
-      background:var(--navy);
-    }
-    .gridc {
-      display:grid;
-      grid-template-columns:repeat(auto-fill,minmax(210px,1fr));
-      gap:14px;
-    }
-    .chart {
-      display:flex;
-      align-items:flex-end;
-      gap:14px;
-      height:180px;
-      padding-top:10px;
-    }
-    .chart div {
-      flex:1;
-      background:linear-gradient(180deg,var(--navy2),var(--navy));
-      border-radius:7px 7px 0 0;
-      position:relative;
-      text-align:center;
-    }
-    .chart div span {
-      position:absolute;
-      bottom:-20px;
-      left:0;
-      right:0;
-      font-size:11px;
-      color:var(--mut);
-    }
-    .chart div b {
-      position:absolute;
-      top:-19px;
-      left:0;
-      right:0;
-      font-size:11px;
-      color:var(--navy);
-    }
-    .frm {
-      display:grid;
-      grid-template-columns:repeat(auto-fit,minmax(230px,1fr));
-      gap:14px;
-    }
-    label {
-      display:block;
-      font-size:12px;
-      font-weight:600;
-      color:var(--mut);
-      margin-bottom:5px;
-    }
-    .t-ds {
-      background:#e4e7eb;
-      color:#8a94a3;
-    }
-    .modalbg {
-      position:fixed;
-      inset:0;
-      background:rgba(11,20,35,.5);
-      z-index:90;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      padding:20px;
-    }
-    .modalbox {
-      background:#fff;
-      border-radius:16px;
-      padding:22px;
-      width:100%;
-      max-width:420px;
-      max-height:86vh;
-      overflow-y:auto;
-      box-shadow:0 20px 60px rgba(0,0,0,.3);
-    }
-    .modalbox h3 {
-      font-size:16px;
-      margin-bottom:14px;
-    }
-    .mrow {
-      display:flex;
-      gap:10px;
-      margin-top:16px;
-    }
-    .mrow .btn {
-      width:auto;
-      flex:1;
-    }
-    @media(max-width:860px) {
-    .adm {
-        grid-template-columns:1fr;
-      }
-    .side {
-        position:static;
-        height:auto;
-      }
-    .cols {
-        grid-template-columns:1fr;
-      }
-    }
-    @media(max-width:430px) {
-    .phone {
-        width:100%;
-        margin:0;
-        border-radius:0;
-        height:100vh;
-        max-height:100vh;
-      }
-    }
-  
-    /* =========================================================
-       Mobile responsive layout
-       Automatically adapts the interface to smaller screens.
-       ========================================================= */
+/* ---- table management ---- */
+const saveTable=()=>{const f=S.modal.f;
+ if(f.isNew){S.tables.push({n:+f.n,seats:+f.seats,loc:f.loc,st:"av"})}
+ else{const t=S.tables.find(x=>x.n==f.origN);t.n=+f.n;t.seats=+f.seats;t.loc=f.loc}
+ closeModal();};
+const deleteTable=n=>{if(confirm(`Delete Table ${n}? This can't be undone.`)){S.tables=S.tables.filter(t=>t.n!=n);r()}};
+const toggleDisableTable=n=>{const t=S.tables.find(x=>x.n==n);t.st=t.st=='ds'?'av':'ds';r()};
 
-    html {
-      width: 100%;
-      overflow-x: hidden;
-    }
+/* ---- food menu management ---- */
+const saveFood=()=>{const f=S.modal.f;
+ if(f.isNew){const id=Math.max(0,...S.menu.map(m=>m.id))+1;S.menu.push({id,n:f.n,p:+f.p,c:f.c,e:f.e||"🍽️",av:1,s:+f.s||0,min:+f.min||10})}
+ else{const m=S.menu.find(x=>x.id==f.id);m.n=f.n;m.p=+f.p;m.c=f.c;m.e=f.e||m.e;m.s=Math.max(0,+f.s);m.min=Math.max(0,+f.min);m.av=m.s>0?1:0}
+ closeModal();};
+const deleteFood=id=>{if(confirm("Delete this menu item?")){S.menu=S.menu.filter(m=>m.id!=id);r()}};
 
-    body {
-      width: 100%;
-      min-width: 0;
-      overflow-x: hidden;
-    }
+/* ---- inventory (mirrors menu stock) ---- */
+const restock=(id,amt)=>{const m=S.menu.find(x=>x.id==id);m.s+=amt;if(m.s>0)m.av=1;r()};
+const saveStock=()=>{const f=S.modal.f;const m=S.menu.find(x=>x.id==f.id);m.s=Math.max(0,+f.s);m.min=Math.max(0,+f.min);m.av=m.s>0?1:0;closeModal();};
 
-    img,
-    svg,
-    video,
-    canvas {
-      max-width: 100%;
-    }
+/* ---- user management ---- */
+const toggleUser=sid=>{const u=S.users.find(x=>x.sid==sid);u.active=u.active?0:1;r()};
 
-    button,
-    input,
-    select,
-    textarea {
-      max-width: 100%;
-    }
+/* ---- reservation search/filter ---- */
+const setResFilter=(k,v)=>{S.resFilter[k]=v;r()};
+const filteredRes=()=>S.res.filter(x=>{
+ const q=S.resFilter.q.toLowerCase();
+ const mq=!q||x.n.toLowerCase().includes(q)||x.sid.toLowerCase().includes(q)||x.id.toLowerCase().includes(q);
+ const ms=S.resFilter.status=='All'||reservationStatus(x)==S.resFilter.status;
+ return mq&&ms;});
 
-    .app,
-    .shell,
-    .main,
-    .content,
-    .page,
-    .container {
-      max-width: 100%;
-    }
+/* ---- settings ---- */
+const setField=(k,v)=>{S.settings[k]=v};
+const saveSettings=()=>{alert("Settings saved!");};
 
-    /* Prevent fixed desktop widths from causing horizontal scrolling. */
-    .table,
-    .card,
-    .panel,
-    .modal,
-    .drawer,
-    .form-grid,
-    .grid,
-    .stats,
-    .table-grid,
-    .menu-grid {
-      max-width: 100%;
-    }
+function attemptLogin(role){
+ const studentId = document.getElementById('stuId')?.value?.trim();
+ const studentPw = document.getElementById('stuPw')?.value?.trim();
+ const adminEmail = document.getElementById('admEmail')?.value?.trim();
+ const adminPw = document.getElementById('admPw')?.value?.trim();
 
-    @media (max-width: 768px) {
-      body {
-        font-size: 14px;
-      }
+ if(role === 's'){
+  const validStudent = studentId === '2023-161302' && studentPw === '4321';
+  if(!validStudent){
+    S.loginError = 'Invalid School ID or password.';
+   r();
+   return;
+  }
 
-      /* Make the main layout use the full phone width. */
-      .app {
-        width: 100%;
-      }
+  S.loggedIn = true;
+  S.role = 's';
+  S.view = 'home';
+  S.tab = 'home';
+  S.user.id = '2023-161302';
+  S.loginError = '';
+  r();
+  return;
+ }
 
-      /* Stack common multi-column layouts on phones. */
-      .grid,
-      .stats,
-      .form-grid,
-      .table-grid,
-      .menu-grid {
-        grid-template-columns: 1fr !important;
-      }
+ const validAdmin = adminEmail === 'admin@gmail.com' && adminPw === '1234';
+ if(!validAdmin){
+  S.loginError = 'Invalid email or password.';
+  r();
+  return;
+ }
 
-      /* Keep cards from becoming wider than the viewport. */
-      .card,
-      .panel,
-      .section,
-      .content-card {
-        width: 100%;
-        box-sizing: border-box;
-      }
+ S.loggedIn = true;
+ S.role = 'a';
+ S.apage = 'dash';
+ S.loginError = '';
+ r();
+}
 
-      /* Make wide tables scroll horizontally instead of breaking the page. */
-      .table-wrap,
-      .table-container,
-      .data-table-wrap {
-        width: 100%;
-        max-width: 100%;
-        overflow-x: auto;
-        -webkit-overflow-scrolling: touch;
-      }
-
-      table {
-        min-width: 600px;
-      }
-
-      /* Improve modal sizing on small screens. */
-      .modal,
-      .modal-card,
-      .modal-content {
-        width: calc(100vw - 24px) !important;
-        max-width: calc(100vw - 24px) !important;
-        max-height: calc(100vh - 24px);
-        box-sizing: border-box;
-        overflow-y: auto;
-      }
-
-      /* Drawer should fit the phone width. */
-      .drawer {
-        width: min(320px, 85vw) !important;
-        max-width: 85vw;
-      }
-
-      /* Header/navigation controls can wrap instead of overflowing. */
-      header,
-      nav,
-      .topbar,
-      .navbar,
-      .header-actions,
-      .toolbar,
-      .actions {
-        max-width: 100%;
-      }
-
-      .header-actions,
-      .toolbar,
-      .actions {
-        flex-wrap: wrap;
-      }
-
-      /* Form fields should use the available width. */
-      input,
-      select,
-      textarea {
-        width: 100%;
-        box-sizing: border-box;
-      }
-
-      /* Keep buttons usable while allowing rows to wrap. */
-      .btn,
-      button {
-        box-sizing: border-box;
-      }
-
-      /* Prevent long text, IDs, and URLs from forcing horizontal scroll. */
-      h1,
-      h2,
-      h3,
-      h4,
-      p,
-      span,
-      label,
-      td,
-      th {
-        overflow-wrap: anywhere;
-      }
-    }
-
-    @media (max-width: 480px) {
-      body {
-        font-size: 13px;
-      }
-
-      h1 {
-        font-size: 1.45rem;
-      }
-
-      h2 {
-        font-size: 1.25rem;
-      }
-
-      h3 {
-        font-size: 1.05rem;
-      }
-
-      /* Reduce spacing slightly on very small phones. */
-      .card,
-      .panel {
-        padding: 12px;
-      }
-
-      .toolbar,
-      .actions {
-        gap: 8px;
-      }
-
-      button,
-      .btn {
-        min-height: 40px;
-      }
-    }
-
-  </style>
-</head>
-
-<body>
-  <!-- Quick role switcher for the prototype. -->
-  <div id="switch">
-    <button id="bs" class="on" onclick="setRole('s')">Student</button>
-    <button id="ba" onclick="setRole('a')">Admin</button>
-  </div>
-
-  <!-- The JavaScript renders the active screen inside this container. -->
-  <div id="app"></div>
-
-  <script>
-    // Format a number as Philippine peso currency.
-    const P=n=>"₱"+n.toFixed(2);
-    // Central application state shared by the student and admin views.
-    const S={
-      role:'s',view:'login',tab:'home',apage:'dash',sel:12,resSel:null,cat:'All',checked:true,left:1695,menuOpen:false,notifOpen:false,
-      user:{
-        name:"Juan Dela Cruz",id:"2023-10456",email:"jdelacruz@nu-baliwag.edu.ph",phone:"0917 555 0148"
-      },
-      tables:[...Array(16)].map((_,i)=>({
-        n:i+1,seats:i%4==3?6:4,loc:i<4?"Near Window":i<8?"Center Hall":i<12?"Near Counter":"Garden Side",st:[7,12].includes(i+1)?"oc":"av"
-      })),
-      menu:[{
-        id:1,n:"Chicken Inasal",p:120,c:"Meals",e:"🍗",av:1,s:42
-      },{
-        id:2,n:"Pork Sisig",p:110,c:"Meals",e:"🥘",av:1,s:28
-      },{
-        id:3,n:"Beef Tapsilog",p:130,c:"Meals",e:"🍳",av:1,s:16
-      },{
-        id:4,n:"Iced Coffee",p:60,c:"Drinks",e:"🧋",av:1,s:55
-      },{
-        id:5,n:"Turon",p:35,c:"Snacks",e:"🍌",av:1,s:60
-      },{
-        id:6,n:"Fries",p:45,c:"Snacks",e:"🍟",av:0,s:0
-      }],
-      cart:{
-        1:1,4:1,2:1
-      },
-      res:[{
-        id:"RSV-1041",n:"Chen Dred",sid:"2023-10011",t:5,s:4,tm:"11:30 AM",ci:"Pending",st:"Confirmed"
-      },{
-        id:"RSV-1042",n:"Mary Jane",sid:"2022-09877",t:8,s:4,tm:"11:35 AM",ci:"Pending",st:"Confirmed"
-      },{
-        id:"RSV-1043",n:"Juan Dela Cruz",sid:"2023-10456",t:12,s:4,tm:"11:40 AM",ci:"Checked-in",st:"Active"
-      },{
-        id:"RSV-1044",n:"Alex Santos",sid:"2021-08123",t:3,s:4,tm:"10:50 AM",ci:"No show",st:"Expired"
-      }],
-      ord:[{
-        id:"ORD-2201",n:"Juan Dela Cruz",t:12,it:"Chicken Inasal ×1, Iced Coffee ×1, Pork Sisig ×1",tot:290,tm:"11:41 AM",st:"Preparing"
-      },{
-        id:"ORD-2202",n:"Mary Jane",t:8,it:"Beef Tapsilog ×2",tot:260,tm:"11:36 AM",st:"Pending"
-      },{
-        id:"ORD-2203",n:"Chen Dred",t:5,it:"Turon ×3, Iced Coffee ×2",tot:225,tm:"11:31 AM",st:"Ready"
-      },{
-        id:"ORD-2204",n:"Alex Santos",t:3,it:"Pork Sisig ×1",tot:110,tm:"10:52 AM",st:"Completed"
-      }],
-      inv:[{
-        n:"Chicken",q:24,u:"kg",m:15
-      },{
-        n:"Rice",q:80,u:"kg",m:30
-      },{
-        n:"Pork",q:12,u:"kg",m:15
-      },{
-        n:"Beef",q:6,u:"kg",m:10
-      },{
-        n:"Coffee",q:9,u:"kg",m:5
-      },{
-        n:"Cooking Oil",q:0,u:"L",m:8
-      },{
-        n:"Vegetables",q:18,u:"kg",m:10
-      },{
-        n:"Bottled Drinks",q:120,u:"pcs",m:48
-      }],
-      ann:[{
-        t:"Canteen will close at 6:00 PM today.",d:"Please manage your dining time.",w:"Today"
-      },{
-        t:"New menu items this week",d:"Bulalo and Halo-halo now available.",w:"Sep 16"
-      },{
-        t:"Reservation reminder",d:"Check in within 15 minutes or your table is released.",w:"Sep 15"
-      }],
-      users:[{
-        n:"Juan Dela Cruz",sid:"2023-10456",em:"jdelacruz@nu-baliwag.edu.ph",res:18,ord:24,active:1
-      },{
-        n:"Mary Jane",sid:"2022-09877",em:"maryjane@nu-baliwag.edu.ph",res:11,ord:15,active:1
-      },{
-        n:"Chen Dred",sid:"2023-10011",em:"chendred@nu-baliwag.edu.ph",res:7,ord:9,active:1
-      },{
-        n:"Alex Santos",sid:"2021-08123",em:"alexsantos@nu-baliwag.edu.ph",res:3,ord:4,active:0
-      }],
-      modal:null,
-      resFilter:{
-        q:"",status:"All"
-      },repFilter:"This Week",menuQuery:"",
-      settings:{
-        name:"NU Baliwag Canteen",hrs:"7:00 AM – 6:00 PM",contact:"(044) 123-4567",email:"canteen@nu-baliwag.edu.ph",maxDur:45,maxSeats:6,ciDeadline:15,cancelWin:10,numTables:16,cap:4,locs:"Near Window, Center Hall, Near Counter, Garden Side",preorder:"Enabled",prepTime:12,cutoff:"5:30 PM",notifRes:1,notifOrd:1,notifInv:1
-      },
-      activeOrder:"ORD-2201",ordSeq:2205,timerStarted:false,annForm:{
-        t:"",d:"",type:"General",w:""
-      },annEdit:null
-    };
-    // Labels and CSS classes used for table status indicators.
-    const stName={
-      av:"Available",rs:"Reserved",oc:"Occupied",ds:"Disabled"
-    },stCls={
-      av:"b-g",rs:"b-o",oc:"b-r",ds:"b-n"
-    },tCls={
-      av:"t-av",rs:"t-rs",oc:"t-oc",ds:"t-ds"
-    };
-    // Count tables by status.
-    const cnt=k=>S.tables.filter(t=>t.st==k).length;
-    const total=()=>Object.entries(S.cart).reduce((a,[id,q])=>a+S.menu.find(m=>m.id==+id).p*q,0);
-    const fmt=s=>String(Math.floor(s/3600)).padStart(2,"0")+":"+String(Math.floor(s%3600/60)).padStart(2,"0")+":"+String(s%60).padStart(2,"0");
-    // Navigate between screens and reset open overlays.
-    const go=(v,x)=>{
-      if(x!==undefined)S.sel=x;
-      S.view=v;
-      S.menuOpen=false;
-      S.notifOpen=false;
-      if(['home','reserve','orders','profile'].includes(v))S.tab=v;
-      r()
-    };
-    const toggleMenu=()=>{
-      S.menuOpen=!S.menuOpen;
-      S.notifOpen=false;
-      r()
-    };
-    const toggleNotif=()=>{
-      S.notifOpen=!S.notifOpen;
-      S.menuOpen=false;
-      r()
-    };
-    const notifList=()=>{
-      const list=[];
-      const o=S.ord.find(x=>x.id==S.activeOrder);
-      if(o)list.push({
-        ic:o.st=='Ready'?'✅':o.st=='Completed'?'🍽️':o.st=='Cancelled'?'⚠️':'👨‍🍳',t:`Order ${o.id} is now ${o.st}`,w:'Just now'
-      });
-      S.ann.slice(0,3).forEach(a=>list.push({
-        ic:'📣',t:a.t,w:a.w
-      }));
-      return list;
-    };
-    // Switch between the student and cafeteria-owner interfaces.
-    const setRole=x=>{
-      S.role=x;
-      S.view=x=='s'?'login':'alogin';
-      bs.className=x=='s'?'on':'';
-      ba.className=x=='a'?'on':'';
-      r()
-    };
-    // Increase or decrease an item quantity in the cart.
-    const qty=(id,d)=>{
-      S.cart[id]=(S.cart[id]||0)+d;
-      if(S.cart[id]<1)delete S.cart[id];
-      r()
-    };
-    // Change a table status and refresh the interface.
-    const setStatus=(n,st)=>{
-      S.tables.find(t=>t.n==n).st=st;
-      r()
-    };
-    const setOrd=(id,st)=>{
-      const o=S.ord.find(x=>x.id==id);
-      o.st=st;
-      if(id==S.activeOrder&&st=='Completed'&&!S.timerStarted){
-        S.left=1695;
-        S.timerStarted=true
-      }
-      r()
-    };
-    const checkin=id=>{
-      const x=S.res.find(o=>o.id==id);
-      x.ci="Checked-in";
-      x.st="Active";
-      setStatus(x.t,"oc")
-    };
-    // Create a reservation and order from the selected table and cart.
-    const confirmOrder=n=>{
-      const items=Object.entries(S.cart).map(([id,q])=>`${S.menu.find(m=>m.id==+id).n} ×${q}`).join(", ")||"No pre-order";
-      const id="ORD-"+(S.ordSeq++);
-      S.ord.unshift({
-        id,n:S.user.name,t:n,it:items,tot:total(),tm:new Date().toLocaleTimeString([], {
-          hour:'2-digit',minute:'2-digit'
-        }),st:"Pending"
-      });
-      S.res.unshift({
-        id:"RSV-"+S.ordSeq,n:S.user.name,sid:S.user.id,t:n,s:S.tables.find(x=>x.n==n).seats,tm:new Date().toLocaleTimeString([], {
-          hour:'2-digit',minute:'2-digit'
-        }),ci:"Checked-in",st:"Active"
-      });
-      setStatus(n,'oc');
-      S.activeOrder=id;
-      S.sel=n;
-      S.cart={
-      };
-      S.left=1695;
-      S.timerStarted=false;
-      go('mine');
-    };
-    const cancelReservation=n=>{
-      setStatus(n,'av');
-      const o=S.ord.find(x=>x.id==S.activeOrder);
-      if(o&&o.st!='Completed')o.st='Cancelled';
-      S.activeOrder=null;
-      S.timerStarted=false;
-      go('home')
-    };
-    const annField=(k,v)=>{
-      S.annForm[k]=v
-    };
-    const annPublish=()=>{
-      if(!S.annForm.t.trim())return;
-      const entry={
-        t:S.annForm.t,d:S.annForm.d,w:S.annForm.w||"Just now"
-      };
-      if(S.annEdit!==null){
-        S.ann[S.annEdit]=entry;
-        S.annEdit=null
-      }
-      else{
-        S.ann.unshift(entry)
-      }
-      S.annForm={
-        t:"",d:"",type:"General",w:""
-      };
-      r();
-    };
-    const annEditStart=i=>{
-      S.annForm={
-        t:S.ann[i].t,d:S.ann[i].d,type:"General",w:S.ann[i].w
-      };
-      S.annEdit=i;
-      r()
-    };
-    const annDelete=i=>{
-      S.ann.splice(i,1);
-      if(S.annEdit==i)S.annEdit=null;
-      r()
-    };
-    const annCancelEdit=()=>{
-      S.annForm={
-        t:"",d:"",type:"General",w:""
-      };
-      S.annEdit=null;
-      r()
-    };
-    /* -------------------- MODAL HELPERS -------------------- */
-    const openModal=(type,data)=>{
-      S.modal={
-        type,f:{
-          ...data
-        }
-      };
-      r()
-    };
-    const closeModal=()=>{
-      S.modal=null;
-      r()
-    };
-    const mset=(k,v)=>{
-      S.modal.f[k]=v
-    };
-    /* -------------------- TABLE MANAGEMENT -------------------- */
-    const saveTable=()=>{
-      const f=S.modal.f;
-      if(f.isNew){
-        S.tables.push({
-          n:+f.n,seats:+f.seats,loc:f.loc,st:"av"
-        })
-      }
-      else{
-        const t=S.tables.find(x=>x.n==f.origN);
-        t.n=+f.n;
-        t.seats=+f.seats;
-        t.loc=f.loc
-      }
-      closeModal();
-    };
-    const deleteTable=n=>{
-      if(confirm(`Delete Table ${n}? This can't be undone.`)){
-        S.tables=S.tables.filter(t=>t.n!=n);
-        r()
-      }
-    };
-    const toggleDisableTable=n=>{
-      const t=S.tables.find(x=>x.n==n);
-      t.st=t.st=='ds'?'av':'ds';
-      r()
-    };
-    /* -------------------- FOOD MENU MANAGEMENT -------------------- */
-    const saveFood=()=>{
-      const f=S.modal.f;
-      if(f.isNew){
-        const id=Math.max(0,...S.menu.map(m=>m.id))+1;
-        S.menu.push({
-          id,n:f.n,p:+f.p,c:f.c,e:f.e||"🍽️",av:1,s:+f.s||0
-        })
-      }
-      else{
-        const m=S.menu.find(x=>x.id==f.id);
-        m.n=f.n;
-        m.p=+f.p;
-        m.c=f.c;
-        m.e=f.e||m.e;
-        m.s=+f.s
-      }
-      closeModal();
-    };
-    const deleteFood=id=>{
-      if(confirm("Delete this menu item?")){
-        S.menu=S.menu.filter(m=>m.id!=id);
-        r()
-      }
-    };
-    /* -------------------- INVENTORY MANAGEMENT -------------------- */
-    const saveInv=()=>{
-      const f=S.modal.f;
-      if(f.isNew){
-        S.inv.push({
-          n:f.n,q:+f.q,u:f.u,m:+f.m
-        })
-      }
-      else{
-        const i=S.inv.find(x=>x.n==f.origN);
-        i.n=f.n;
-        i.q=+f.q;
-        i.u=f.u;
-        i.m=+f.m
-      }
-      closeModal();
-    };
-    const removeInv=n=>{
-      if(confirm(`Remove "${n}" from inventory?`)){
-        S.inv=S.inv.filter(i=>i.n!=n);
-        r()
-      }
-    };
-    /* -------------------- USER MANAGEMENT -------------------- */
-    const toggleUser=sid=>{
-      const u=S.users.find(x=>x.sid==sid);
-      u.active=u.active?0:1;
-      r()
-    };
-    /* -------------------- RESERVATION SEARCH / FILTER -------------------- */
-    const setResFilter=(k,v)=>{
-      S.resFilter[k]=v;
-      r()
-    };
-    const filteredRes=()=>S.res.filter(x=>{
-      const q=S.resFilter.q.toLowerCase();
-      const mq=!q||x.n.toLowerCase().includes(q)||x.sid.toLowerCase().includes(q)||x.id.toLowerCase().includes(q);
-      const ms=S.resFilter.status=='All'||x.st==S.resFilter.status;
-      return mq&&ms;
-    });
-    /* -------------------- SETTINGS -------------------- */
-    const setField=(k,v)=>{
-      S.settings[k]=v
-    };
-    const saveSettings=()=>{
-      alert("Settings saved!");
-    };
-    /* ========================================================
-       STUDENT INTERFACE
-       ======================================================== */
-    function student(){
-      if(S.view=='login')return `<div class="phone" style="background:var(--navy);justify-content:center;padding:26px">
-      <div style="text-align:center;color:#fff">
-       <div style="width:86px;height:86px;margin:0 auto 18px;border-radius:50%;border:3px solid var(--gold);color:var(--gold);display:grid;place-items:center;font-weight:800;font-size:26px">NU</div>
-       <h1 style="font-size:26px;line-height:1.25">NU BALIWAG<br>CANTEEN</h1>
-       <p style="letter-spacing:2px;font-size:12px;margin:8px 0 26px;color:#cfdaec">TABLE RESERVATION SYSTEM</p>
-       <div style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.18);border-radius:12px;padding:6px;margin-bottom:10px"><input placeholder="School ID" value="2023-10456" style="background:transparent;border:0;color:#fff"></div>
-       <div style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.18);border-radius:12px;padding:6px"><input type="password" placeholder="Password" value="1234" style="background:transparent;border:0;color:#fff"></div>
-       <p style="text-align:right;font-size:12px;color:#cfdaec;margin:10px 0 18px">Forgot password?</p>
-       <button class="btn" style="background:transparent;border:1.5px solid var(--gold);color:#fff" onclick="go('home')">LOGIN</button>
-       <p style="font-size:10.5px;color:#8fa4c4;margin-top:26px">© 2026 NU Baliwag. All rights reserved.</p>
-      </div></div>`;
-      const head=(t,b,rt)=>`<div class="shead">${b?`<button class="ic" onclick="go('${b}')">←</button>`:`<button class="ic" onclick="toggleMenu()">☰</button>`}<h2>${t}</h2>${rt||'<div class="ic"></div>'}</div>`;
-      let h="",bar=1;
-      if(S.view=='home'){
-        h=head("",0,'<button class="ic" onclick="toggleNotif()">🔔</button>').replace('<h2></h2>',`<div style="flex:1"><b style="font-size:16px">Hello, ${S.user.name}!</b><div style="font-size:11.5px;color:#cfdaec">Student</div></div>`)+
-        `<div class="sbody"><div class="card"><div class="ttl">Current Reservation</div>
-       <div class="row"><b style="font-size:21px">Table ${S.sel||12}</b><span class="badge b-g">Check-in Successful</span></div>
-       <p class="mut" style="margin:12px 0 4px">${S.timerStarted?"Dining time remaining:":"Dining timer:"}</p>${S.timerStarted?`<div class="timer" id="tm">${
-          fmt(S.left)
-        }
-        </div>`:`<div class="timer" style="color:var(--mut);font-size:20px">Starts once order is completed</div>`}
-       <button class="btn" style="margin-top:12px" onclick="go('mine')">View Reservation</button></div>
-       <div class="ttl" style="margin-left:2px">Quick Actions</div><div class="qa">
-       <div onclick="go('reserve')"><span>🪑</span>Reserve Table</div><div onclick="go('menu')"><span>📖</span>Browse Menu</div><div onclick="go('orders')"><span>🧾</span>My Orders</div></div>
-       <div class="ttl" style="margin:16px 0 8px 2px">Announcements</div>
-       ${S.ann.map(a=>`<div class="card" style="padding:13px"><div class="row"><div><b style="font-size:13.5px">${
-          a.t
-        }
-        </b><div class="mut">${
-          a.d
-        }
-        </div></div><span class="mut">${
-          a.w
-        }
-        </span></div></div>`).join("")}</div>`;
-      }
-      else if(S.view=='reserve'){
-        const t=S.resSel?S.tables.find(x=>x.n==S.resSel):null;
-        h=head("Select a Table",'home')+`<div class="sbody"><p style="text-align:center;font-weight:600;font-size:13px;margin-bottom:6px">Cafeteria Layout</p>
-       <div class="leg"><span><i class="dot" style="background:var(--gr)"></i>Available</span><span><i class="dot" style="background:var(--or)"></i>Reserved</span><span><i class="dot" style="background:var(--rd)"></i>Occupied</span></div>
-       <div class="card"><div class="grid4" style="row-gap:20px">${S.tables.map(x=>`<button class="tbl ${tCls[x.st]} ${S.resSel==x.n?'sel':''}" onclick="${x.st=='av'?`S.resSel=${x.n};r()`:''}">${
-          x.n
-        }
-        </button>`).join("")}</div></div>
-       ${t?`<div class="card"><div class="row"><b style="font-size:17px">Table ${
-          t.n
-        }
-        </b><span class="badge ${stCls[t.st]}">${
-          stName[t.st]
-        }
-        </span></div>
-        <div class="row" style="margin:12px 0"><span class="mut">👥 ${
-          t.seats
-        }
-        Seats</span><span class="mut">📍 ${
-          t.loc
-        }
-        </span><span class="mut">⏱ 45 mins</span></div>
-        <button class="btn" onclick="setStatus(${t.n},'rs');S.resSel=null;go('menu',${t.n})">RESERVE TABLE</button></div>`:`<p class="mut" style="text-align:center">Tap an available table to continue.</p>`}</div>`;
-      }
-      else if(S.view=='menu'){
-        const list=S.menu.filter(m=>(S.cat=='All'||m.c==S.cat)&&m.n.toLowerCase().includes(S.menuQuery.toLowerCase()));
-        h=head("Menu",'home',`<button class="ic" onclick="go('summary')">🛒</button>`)+`<div class="sbody">
-       <input placeholder="🔍  Search food or drinks..." value="${S.menuQuery.replace(/"/g,'&quot;')}" oninput="S.menuQuery=this.value;r()" style="margin-bottom:12px">
-       <div class="chips">${["All","Meals","Snacks","Drinks"].map(c=>`<button class="${S.cat==c?'on':''}" onclick="S.cat='${c}';r()">${
-          c
-        }
-        </button>`).join("")}</div>
-       ${list.map(m=>`<div class="food"><div class="thumb">${
-          m.e
-        }
-        </div><div style="flex:1"><b style="font-size:14px">${
-          m.n
-        }
-        </b><div class="mut">${
-          P(m.p)
-        }
-        ${
-          m.av?"":" · Unavailable"
-        }
-        </div></div>
-        ${
-          !m.av?'<span class="badge b-r">Sold out</span>':S.cart[m.id]?`<div class="qty"><button onclick="qty(${m.id},-1)">−</button>${S.cart[m.id]}<button onclick="qty(${m.id},1)">+</button></div>`:`<button class="btn sm" onclick="qty(${m.id},1)">Add</button>`
-        }
-        </div>`).join("")||'<p class="mut" style="text-align:center;margin-top:20px">No matching items.</p>'}
-       <button class="btn" onclick="go('summary')">VIEW CART · ${P(total())}</button></div>`;
-      }
-      else if(S.view=='summary'){
-        const t=S.tables.find(x=>x.n==(S.sel||12));
-        h=head("Summary",'menu')+`<div class="sbody"><div class="card"><div class="ttl">Reservation Details</div>
-       <div class="row" style="margin-bottom:8px"><span class="mut">Table</span><b>${t.n}</b></div>
-       <div class="row" style="margin-bottom:8px"><span class="mut">Seats</span><b>${t.seats}</b></div>
-       <div class="row" style="margin-bottom:8px"><span class="mut">Reservation valid for</span><b>45:00 minutes</b></div>
-       <div class="row"><span class="mut">Please check-in before</span><b>11:45 AM</b></div></div>
-       <div class="card"><div class="ttl">Order Summary</div>
-       ${Object.entries(S.cart).map(([id,q])=>{const m=S.menu.find(x=>x.id==+id);return `<div class="row" style="margin-bottom:9px"><span>${
-          q
-        }
-        &nbsp;
-        ${
-          m.n
-        }
-        </span><b>${
-          P(m.p*q)
-        }
-        </b></div>`}).join("")||'<p class="mut">Cart is empty.</p>'}
-       <div class="row" style="border-top:1px solid var(--line);padding-top:11px;margin-top:11px"><b>Total</b><b style="font-size:17px">${P(total())}</b></div></div>
-       <button class="btn" onclick="confirmOrder(${t.n})">CONFIRM RESERVATION &amp; ORDER</button></div>`;
-      }
-      else if(S.view=='mine'){
-        const tn=S.sel||12,t=S.tables.find(x=>x.n==tn),o=S.ord.find(x=>x.id==S.activeOrder)||S.ord[0];
-        h=head("My Reservation",'home')+`<div class="sbody">
-       <div class="card" style="background:var(--grb);border-color:#bfe8ca"><b style="color:var(--gr)">You are now checked-in!</b>
-        <div class="row" style="margin-top:8px"><div><b style="font-size:21px">Table ${tn}</b><div class="mut">👥 ${t?t.seats:4} Seats</div></div><span style="font-size:34px">🪑</span></div></div>
-       <div class="card" style="text-align:center">${S.timerStarted?`<p class="mut">Dining time remaining</p><div class="timer" id="tm">${
-          fmt(S.left)
-        }
-        </div>
-        <p class="mut" style="margin-top:6px">Please settle your dining before the time expires.</p>`:`<p class="mut">Dining timer</p><div class="timer" style="color:var(--mut);font-size:26px">Not started yet</div>
-        <p class="mut" style="margin-top:6px">The countdown will start once the cafeteria marks your order as <b>Completed</b>.</p>`}</div>
-       <div class="card"><div class="ttl">Order Status</div>
-       ${o.it=="No pre-order"?'<p class="mut">No food pre-ordered for this reservation.</p>':o.it.split(", ").map((x,i)=>`<div class="food" style="box-shadow:none;margin-bottom:8px"><div class="thumb">${
-          ["🍗","🧋","🥘","🍟","🍌"][i%5]
-        }
-        </div><div style="flex:1"><b style="font-size:13.5px">${
-          x
-        }
-        </b><div class="mut" style="color:${o.st=='Ready'?'var(--gr)':o.st=='Completed'?'var(--navy)':'var(--or)'};font-weight:700">${
-          o.st
-        }
-        </div><div class="mut">Estimated ready: 11:50 AM</div></div></div>`).join("")}</div>
-       <button class="btn d" onclick="cancelReservation(${tn})">CANCEL RESERVATION</button></div>`;
-      }
-      else if(S.view=='orders'){
-        h=head("My Orders",0,'<button class="ic" onclick="toggleNotif()">🔔</button>')+`<div class="sbody"><div class="ttl">Current Order</div>
-      <div class="card"><div class="row"><b>${S.ord[0].id}</b><span class="badge b-o">${S.ord[0].st}</span></div><p class="mut" style="margin:6px 0">${S.ord[0].it}</p><div class="row"><span class="mut">Table ${S.ord[0].t} · ${S.ord[0].tm}</span><b>${P(S.ord[0].tot)}</b></div></div>
-      <div class="ttl">Previous Orders</div>
-      ${[["ORD-2190","Beef Tapsilog ×1, Iced Coffee ×1","Sep 16",190],["ORD-2172","Pork Sisig ×2","Sep 14",220],["ORD-2155","Turon ×4","Sep 11",140]].map(o=>`<div class="card"><div class="row"><b>${
-          o[0]
-        }
-        </b><span class="badge b-g">Completed</span></div><p class="mut" style="margin:6px 0">${
-          o[1]
-        }
-        </p><div class="row"><span class="mut">${
-          o[2]
-        }
-        </span><b>${
-          P(o[3])
-        }
-        </b></div></div>`).join("")}
-      <div class="ttl">Reservation History</div>
-      ${S.res.slice(0,3).map(x=>`<div class="card" style="padding:12px"><div class="row"><b>Table ${
-          x.t
-        }
-        </b><span class="badge ${x.st=='Expired'?'b-r':'b-g'}">${
-          x.st
-        }
-        </span></div><div class="mut">${
-          x.tm
-        }
-        · ${
-          x.s
-        }
-        seats</div></div>`).join("")}</div>`;
-      }
-      else if(S.view=='profile'){
-        h=head("Profile",0,'<button class="ic" onclick="toggleNotif()">🔔</button>')+`<div class="sbody"><div class="card" style="text-align:center">
-      <div style="width:74px;height:74px;border-radius:50%;background:var(--navy);color:#fff;display:grid;place-items:center;font-size:26px;font-weight:700;margin:0 auto 10px">JD</div>
-      <b style="font-size:18px">${S.user.name}</b><div class="mut">Student · College of Engineering</div></div>
-      <div class="card">${[["School ID",S.user.id],["Email",S.user.email],["Contact",S.user.phone],["Campus","NU Baliwag"]].map(x=>`<div class="row" style="margin-bottom:11px"><span class="mut">${
-          x[0]
-        }
-        </span><b style="font-size:13px">${
-          x[1]
-        }
-        </b></div>`).join("")}</div>
-      <div class="card">${["Edit Profile","Notification Settings","Help & Support"].map(x=>`<div class="row" style="margin-bottom:12px"><span>${
-          x
-        }
-        </span><span class="mut">›</span></div>`).join("")}</div>
-      <button class="btn d" onclick="go('login')">LOGOUT</button></div>`;
-      }
-      else {
-        bar=0;
-        h=head("Page",'home')+'<div class="sbody"></div>'
-      }
-      const nav=bar?`<div class="bnav">${[["home","🏠","Home"],["reserve","🪑","Reservation"],["orders","🧾","Orders"],["profile","👤","Profile"]].map(n=>`<button class="${S.tab==n[0]?'on':''}" onclick="go('${n[0]}')"><span>${
-        n[1]
-      }
-      </span>${
-        n[2]
-      }
-      </button>`).join("")}</div>`:"";
-      const drawer=S.menuOpen?`<div class="backdrop" onclick="toggleMenu()"></div><div class="drawer">
-      <div class="dhead"><div class="crest" style="background:var(--gold);color:var(--navy)">JD</div><div><b style="font-size:14px">${S.user.name}</b><div class="mut" style="font-size:11px">${S.user.id}</div></div></div>
-      <nav>
-       <button onclick="go('home')">🏠 &nbsp;Home</button>
-       <button onclick="go('reserve')">🪑 &nbsp;Reserve Table</button>
-       <button onclick="go('menu')">📖 &nbsp;Browse Menu</button>
-       <button onclick="go('mine')">⏱ &nbsp;My Reservation</button>
-       <button onclick="go('orders')">🧾 &nbsp;My Orders</button>
-       <button onclick="go('profile')">👤 &nbsp;Profile</button>
-      </nav>
-      <button class="btn d" style="margin-top:auto" onclick="go('login')">⎋ Logout</button>
-     </div>`:"";
-      const notifs=notifList();
-      const panel=S.notifOpen?`<div class="backdrop" onclick="toggleNotif()"></div><div class="notifpanel">
-      <div class="ttl" style="margin-bottom:2px">Notifications</div>
-      ${notifs.map(n=>`<div class="nitem"><span>${
-        n.ic
-      }
-      </span><div><b style="font-size:12.5px">${
-        n.t
-      }
-      </b><div class="mut" style="font-size:11px">${
-        n.w
-      }
-      </div></div></div>`).join("")}
-     </div>`:"";
-      return `<div class="phone">${h}${nav}${drawer}${panel}</div>`;
-    }
-    /* ========================================================
-       ADMIN INTERFACE
-       ======================================================== */
-    const NAV=[["dash","📊 Dashboard"],["res","📅 Reservations"],["tables","🪑 Table Management"],["ord","🧾 Orders"],["menu","🍽 Food Menu"],["inv","📦 Inventory"],["ann","📣 Announcements"],["rep","📈 Reports"],["users","👥 Users"],["set","⚙ Settings"]];
-    const card=(t,b,w)=>`<div class="card" style="${w||''}"><div class="ttl">${t}</div>${b}</div>`;
-    function admin(){
-      if(S.view=='alogin')return `<div style="min-height:100vh;display:grid;place-items:center;background:var(--navy);padding:20px"><div style="background:#fff;border-radius:18px;padding:34px;width:400px;box-shadow:0 20px 60px rgba(0,0,0,.3)">
-      <div style="text-align:center;margin-bottom:22px"><div class="crest" style="margin:0 auto 12px;width:52px;height:52px;font-size:17px">NU</div>
-      <b style="font-size:18px">NU BALIWAG CANTEEN</b><p class="mut" style="letter-spacing:1.5px;font-size:11px">TABLE RESERVATION SYSTEM</p>
-      <h2 style="font-size:16px;margin-top:16px">Cafeteria Owner Login</h2></div>
-      <label>Username / Email</label><input value="owner@nu-baliwag.edu.ph" style="margin-bottom:12px">
-      <label>Password</label><input type="password" value="admin123">
-      <div class="row" style="margin:14px 0 18px"><label style="margin:0;display:flex;gap:7px;align-items:center"><input type="checkbox" checked style="width:auto"> Remember Me</label><span class="mut">Forgot Password?</span></div>
-      <button class="btn" onclick="go('adash')">LOGIN</button></div></div>`;
-      const p=S.apage;
-      let body="",title=NAV.find(n=>n[0]==p)[1].slice(2);
-      if(p=='dash'){
-        body=`<div class="stats">
-      ${[["Total Tables",16],["Available",cnt('av')],["Reserved",cnt('rs')],["Occupied",cnt('oc')],["Today's Reservations",S.res.length],["Pending Orders",S.ord.filter(o=>o.st=='Pending'||o.st=='Preparing').length],["Today's Sales",P(885)]].map(s=>`<div class="stat"><span class="mut">${
-          s[0]
-        }
-        </span><b>${
-          s[1]
-        }
-        </b></div>`).join("")}</div>
-      <div class="cols">${card("Cafeteria Status Overview",`<div class="leg" style="justify-content:flex-start"><span><i class="dot" style="background:var(--gr)"></i>Available</span><span><i class="dot" style="background:var(--or)"></i>Reserved</span><span><i class="dot" style="background:var(--rd)"></i>Occupied</span></div><div class="grid4" style="row-gap:20px">${
-          S.tables.map(t=>`<div class="tbl ${tCls[t.st]}">${t.n}</div>`).join("")
-        }
-        </div>`)}
-      <div>${card("Today's Reservations",`<table>${
-          S.res.map(x=>`<tr><td><b>${x.n}</b><div class="mut">Table ${x.t} · ${x.tm}</div></td><td style="text-align:right"><span class="badge ${x.st=='Expired'?'b-r':x.st=='Active'?'b-g':'b-o'}">${x.st}</span></td></tr>`).join("")
-        }
-        </table>`)}
-      ${card("Recent Orders",`<table>${
-          S.ord.map(o=>`<tr><td><b>${o.id}</b><div class="mut">${o.n} · Table ${o.t}</div></td><td style="text-align:right"><b>${P(o.tot)}</b><div class="mut">${o.st}</div></td></tr>`).join("")
-        }
-        </table>`)}
-      ${card("Popular Food Items",S.menu.slice(0,4).map((m,i)=>`<div style="margin-bottom:11px"><div class="row"><span>${
-          m.e
-        }
-        ${
-          m.n
-        }
-        </span><b class="mut">${
-          [38,31,22,17][i]
-        }
-        orders</b></div><div class="bar"><i style="width:${[100,82,58,45][i]}%"></i></div></div>`).join(""))}</div></div>`;
-      }
-      else if(p=='tables'){
-        body=`<div class="row" style="margin-bottom:14px"><p class="mut">Click a table to change its status.</p><button class="btn sm" style="background:var(--navy);color:#fff" onclick="openModal('table',{isNew:true,n:S.tables.length?Math.max(...S.tables.map(t=>t.n))+1:1,seats:4,loc:'Center Hall'})">+ Add New Table</button></div>
-      <div class="gridc">${S.tables.map(t=>`<div class="card" style="margin:0"><div class="row"><b>Table ${
-          t.n
-        }
-        </b><span class="badge ${stCls[t.st]}">${
-          stName[t.st]
-        }
-        </span></div>
-        <div class="mut" style="margin:7px 0 11px">👥 ${
-          t.seats
-        }
-        seats · 📍 ${
-          t.loc
-        }
-        </div>
-        <div style="display:flex;gap:6px;flex-wrap:wrap">${
-          [["av","Available"],["rs","Reserved"],["oc","Occupied"]].map(x=>`<button class="btn sm g" style="border-color:var(--line)" onclick="setStatus(${t.n},'${x[0]}')">${x[1]}</button>`).join("")
-        }
-        <button class="btn sm g" style="border-color:var(--line)" onclick="toggleDisableTable(${t.n})">${
-          t.st=='ds'?'Enable':'Disable'
-        }
-        </button><button class="btn sm g" style="border-color:var(--line)" onclick="openModal('table',{isNew:false,origN:${t.n},n:${t.n},seats:${t.seats},loc:'${t.loc}'})">Edit</button><button class="btn sm d" onclick="deleteTable(${t.n})">Delete</button></div></div>`).join("")}</div>`;
-      }
-      else if(p=='res'){
-        const rows=filteredRes();
-        body=`<div class="row" style="margin-bottom:14px;gap:10px"><input placeholder="Search reservation or student..." style="max-width:300px" value="${S.resFilter.q}" oninput="setResFilter('q',this.value)"><select style="max-width:170px" onchange="setResFilter('status',this.value)">${["All","Confirmed","Active","Expired"].map(s=>`<option${
-          S.resFilter.status==s?' selected':''
-        }
-        >${
-          s=='All'?'All statuses':s
-        }
-        </option>`).join("")}</select></div>
-      ${card(`Reservations (${
-          rows.length
-        })`,`<table><tr><th>ID</th><th>Student</th><th>School ID</th><th>Table</th><th>Seats</th><th>Time</th><th>Check-in</th><th>Status</th><th>Actions</th></tr>
-        ${
-          rows.map(x=>`<tr><td><b>${x.id}</b></td><td>${x.n}</td><td class="mut">${x.sid}</td><td>${x.t}</td><td>${x.s}</td><td>${x.tm}</td><td><span class="badge ${x.ci=='Checked-in'?'b-g':x.ci=='No show'?'b-r':'b-n'}">${x.ci}</span></td><td><span class="badge ${x.st=='Expired'?'b-r':x.st=='Active'?'b-g':'b-o'}">${x.st}</span></td>
-      <td style="white-space:nowrap">${x.ci=='Pending'?`<button class="btn sm" onclick="checkin('${x.id}')">Check-in</button> `:''}<button class="btn sm g" style="border-color:var(--line)" onclick='openModal("resview",${JSON.stringify(x)})'>View</button></td></tr>`).join("")||'<tr><td colspan="9" class="mut" style="text-align:center;padding:20px">No matching reservations.</td></tr>'
-        }
-        </table>`)}`;
-      }
-      else if(p=='ord'){
-        const F={
-          Pending:["Start Preparing","Preparing"],Preparing:["Mark as Ready","Ready"],Ready:["Complete Order","Completed"]
-        };
-        body=card("Food Orders",`<table><tr><th>Order ID</th><th>Student</th><th>Table</th><th>Items</th><th>Total</th><th>Time</th><th>Status</th><th>Actions</th></tr>
-      ${S.ord.map(o=>`<tr><td><b>${
-          o.id
-        }
-        </b></td><td>${
-          o.n
-        }
-        </td><td>${
-          o.t
-        }
-        </td><td class="mut">${
-          o.it
-        }
-        </td><td><b>${
-          P(o.tot)
-        }
-        </b></td><td>${
-          o.tm
-        }
-        </td>
-        <td><span class="badge ${o.st=='Completed'?'b-g':o.st=='Cancelled'?'b-r':o.st=='Ready'?'b-n':'b-o'}">${
-          o.st
-        }
-        </span></td>
-        <td style="white-space:nowrap">${
-          F[o.st]?`<button class="btn sm" onclick="setOrd('${o.id}','${F[o.st][1]}')">${F[o.st][0]}</button> `:''
-        }
-        ${
-          o.st=='Completed'||o.st=='Cancelled'?'—':`<button class="btn sm d" onclick="setOrd('${o.id}','Cancelled')">Cancel</button>`
-        }
-        </td></tr>`).join("")}</table>`);
-      }
-      else if(p=='menu'){
-        body=`<div class="row" style="margin-bottom:14px"><div class="chips" style="margin:0">${["All","Meals","Snacks","Drinks"].map(c=>`<button class="${S.cat==c?'on':''}" onclick="S.cat='${c}';r()">${
-          c
-        }
-        </button>`).join("")}</div><button class="btn sm" style="background:var(--navy);color:#fff" onclick="openModal('food',{isNew:true,n:'',p:0,c:'Meals',e:'🍽️',s:0})">+ Add Food</button></div>
-      <div class="gridc">${S.menu.filter(m=>S.cat=='All'||m.c==S.cat).map(m=>`<div class="card" style="margin:0"><div class="row"><div class="thumb" style="width:52px;height:52px">${
-          m.e
-        }
-        </div><span class="badge ${m.av?'b-g':'b-r'}">${
-          m.av?'Available':'Unavailable'
-        }
-        </span></div>
-        <b style="display:block;margin:10px 0 3px">${
-          m.n
-        }
-        </b><div class="mut">${
-          m.c
-        }
-        · Stock: ${
-          m.s
-        }
-        </div><b style="display:block;margin:6px 0 10px;font-size:17px">${
-          P(m.p)
-        }
-        </b>
-        <div style="display:flex;gap:6px;flex-wrap:wrap"><button class="btn sm g" style="border-color:var(--line)" onclick='openModal("food",{isNew:false,id:${m.id},n:"${m.n}",p:${m.p},c:"${m.c}",e:"${m.e}",s:${m.s}})'>Edit</button><button class="btn sm g" style="border-color:var(--line)" onclick="S.menu.find(x=>x.id==${m.id}).av^=1;r()">${
-          m.av?'Disable':'Enable'
-        }
-        </button><button class="btn sm d" onclick="deleteFood(${m.id})">Delete</button></div></div>`).join("")}</div>`;
-      }
-      else if(p=='inv'){
-        const low=S.inv.filter(i=>i.q<=i.m);
-        body=(low.length?`<div class="card" style="border-left:4px solid var(--or);background:var(--orb)"><b>⚠ Low inventory warning</b><p class="mut">${low.map(i=>i.n).join(", ")} ${low.length>1?'are':'is'} at or below the minimum stock level.</p></div>`:'')+
-        `<div class="row" style="margin-bottom:14px"><p class="mut">Track ingredients and supplies.</p><button class="btn sm" style="background:var(--navy);color:#fff" onclick="openModal('inv',{isNew:true,n:'',q:0,u:'kg',m:5})">+ Add Inventory Item</button></div>
-      ${card("Stock Levels",`<table><tr><th>Item</th><th>Current Stock</th><th>Unit</th><th>Min. Level</th><th>Status</th><th>Actions</th></tr>
-        ${
-          S.inv.map(i=>{
-            const st=i.q==0?["Out of Stock","b-r"]:i.q<=i.m?["Low Stock","b-o"]:["In Stock","b-g"];
-            return `<tr><td><b>${i.n}</b></td><td>${i.q}</td><td class="mut">${i.u}</td><td>${i.m}</td><td><span class="badge ${st[1]}">${st[0]}</span></td>
-      <td style="white-space:nowrap"><button class="btn sm g" style="border-color:var(--line)" onclick="S.inv.find(x=>x.n=='${i.n}').q+=5;r()">+5</button> <button class="btn sm g" style="border-color:var(--line)" onclick='openModal("inv",{isNew:false,origN:"${i.n}",n:"${i.n}",q:${i.q},u:"${i.u}",m:${i.m}})'>Edit</button> <button class="btn sm d" onclick="removeInv('${i.n}')">Remove</button></td></tr>`
-          }).join("")
-        }
-        </table>`)}`;
-      }
-      else if(p=='ann'){
-        body=`<div class="cols">${card(S.annEdit!==null?"Edit Announcement":"Create Announcement",`<label>Title</label><input value="${S.annForm.t.replace(/"/g,'&quot;')
-      }
-      " oninput="annField('t',this.value)" placeholder="e.g. Cafeteria closing early" style="margin-bottom:12px">
-      <label>Message</label><textarea rows="4" oninput="annField('d',this.value)" placeholder="Details shown on the student dashboard...">${S.annForm.d}</textarea>
-      <div class="frm" style="margin:14px 0"><div><label>Type</label><select onchange="annField('type',this.value)"><option${S.annForm.type=='General'?' selected':''}>General</option><option${S.annForm.type=='Closing time'?' selected':''}>Closing time</option><option${S.annForm.type=='Menu change'?' selected':''}>Menu change</option><option${S.annForm.type=='Maintenance'?' selected':''}>Maintenance</option><option${S.annForm.type=='Holiday schedule'?' selected':''}>Holiday schedule</option></select></div><div><label>Schedule label</label><input value="${
-        S.annForm.w.replace(/"/g,'&quot;')}" oninput="annField('w',this.value)" placeholder="e.g. Today, Sep 20"></div></div>
-        <div style="display:flex;gap:8px"><button class="btn" onclick="annPublish()">${
-          S.annEdit!==null?"SAVE CHANGES":"PUBLISH ANNOUNCEMENT"
-        }
-        </button>${
-          S.annEdit!==null?'<button class="btn g" style="border-color:var(--line)" onclick="annCancelEdit()">Cancel</button>':''
-        }
-        </div>`)}
-      ${card("Published",S.ann.length?S.ann.map((a,i)=>`<div style="border-bottom:1px solid var(--line);padding-bottom:11px;margin-bottom:11px"><div class="row"><b style="font-size:13.5px">${
-          a.t
-        }
-        </b><span class="mut">${
-          a.w
-        }
-        </span></div><p class="mut" style="margin:4px 0 8px">${
-          a.d
-        }
-        </p><button class="btn sm g" style="border-color:var(--line)" onclick="annEditStart(${i})">Edit</button> <button class="btn sm d" onclick="annDelete(${i})">Delete</button></div>`).join(""):'<p class="mut">No announcements yet.</p>')}</div>`;
-      }
-      else if(p=='rep'){
-        const RD={
-          Today:{
-            s:[["Reservations today",52],["Food Orders",68],["Revenue",P(7940)],["Avg. table usage","64%"]],D:[6,9,14,11,7,3,2],p:[22,17,12,9]
-          },
-          "This Week":{
-            s:[["Reservations this week",349],["Food Orders",412],["Revenue",P(48620)],["Avg. table usage","72%"]],D:[42,55,38,61,74,49,30],p:[128,96,74,61]
-          },
-          "This Month":{
-            s:[["Reservations this month",1480],["Food Orders",1795],["Revenue",P(206400)],["Avg. table usage","69%"]],D:[210,245,198,268],p:[540,410,320,255]
-          },
-          "Custom Date":{
-            s:[["Reservations in range",0],["Food Orders",0],["Revenue",P(0)],["Avg. table usage","—"]],D:[0,0,0,0,0,0,0],p:[0,0,0,0]
-          }
-        };
-        const rd=RD[S.repFilter],W=S.repFilter=="This Month"?["Wk 1","Wk 2","Wk 3","Wk 4"]:["Mon","Tue","Wed","Thu","Fri","Sat","Sun"].slice(0,rd.D.length),mx=Math.max(1,...rd.D);
-        body=`<div class="chips" style="margin-bottom:14px">${["Today","This Week","This Month","Custom Date"].map(c=>`<button class="${S.repFilter==c?'on':''}" onclick="S.repFilter='${c}';r()">${
-          c
-        }
-        </button>`).join("")}</div>
-      <div class="stats">${rd.s.map(s=>`<div class="stat"><span class="mut">${
-          s[0]
-        }
-        </span><b>${
-          s[1]
-        }
-        </b></div>`).join("")}</div>
-      <div class="cols">${card("Daily Reservations",`<div class="chart">${
-          rd.D.map((v,i)=>`<div style="height:${Math.max(4,v/mx*100)}%"><b>${v}</b><span>${W[i]||''}</span></div>`).join("")
-        }
-        </div><div style="height:22px"></div>`)}
-      <div>${card("Most Ordered Food",S.menu.slice(0,4).map((m,i)=>`<div style="margin-bottom:11px"><div class="row"><span>${
-          m.n
-        }
-        </span><b class="mut">${
-          rd.p[i]
-        }
-        </b></div><div class="bar"><i style="width:${Math.max(2,rd.p[i]/Math.max(1,rd.p[0])*100)}%"></i></div></div>`).join(""))}
-      ${card("Peak Reservation Times",`<table>${
-          [["11:00 – 12:00","Very High"],["12:00 – 13:00","High"],["15:00 – 16:00","Moderate"],["17:00 – 18:00","Low"]].map(x=>`<tr><td>${x[0]}</td><td style="text-align:right"><span class="badge ${x[1]=='Low'?'b-n':x[1]=='Moderate'?'b-o':'b-g'}">${x[1]}</span></td></tr>`).join("")
-        }
-        </table>`)}</div></div>`;
-      }
-      else if(p=='users'){
-        const q=(S.resFilter.uq||"").toLowerCase(),rows=S.users.filter(u=>!q||u.n.toLowerCase().includes(q)||u.sid.includes(q));
-        body=card("Student Accounts",`<input placeholder="Search student..." style="max-width:300px;margin-bottom:14px" oninput="S.resFilter.uq=this.value;r()">
-      <table><tr><th>Name</th><th>School ID</th><th>Email</th><th>Reservations</th><th>Orders</th><th>Status</th><th>Actions</th></tr>
-      ${rows.map(u=>`<tr><td><b>${
-          u.n
-        }
-        </b></td><td class="mut">${
-          u.sid
-        }
-        </td><td class="mut">${
-          u.em
-        }
-        </td><td>${
-          u.res
-        }
-        </td><td>${
-          u.ord
-        }
-        </td>
-        <td><span class="badge ${u.active?'b-g':'b-r'}">${
-          u.active?'Active':'Disabled'
-        }
-        </span></td><td style="white-space:nowrap"><button class="btn sm g" style="border-color:var(--line)" onclick='openModal("userview",${JSON.stringify(u)})'>View</button> <button class="btn sm ${u.active?'d':''}" onclick="toggleUser('${u.sid}')">${
-          u.active?'Disable':'Enable'
-        }
-        </button></td></tr>`).join("")}</table>`);
-      }
-      else {
-        const s=S.settings;
-        body=`<div class="cols">${card("Cafeteria Information",`<div class="frm"><div><label>Cafeteria name</label><input value="${s.name}" oninput="setField('name',this.value)"></div><div><label>Operating hours</label><input value="${s.hrs}" oninput="setField('hrs',this.value)"></div><div><label>Contact number</label><input value="${s.contact}" oninput="setField('contact',this.value)"></div><div><label>Email</label><input value="${s.email}" oninput="setField('email',this.value)"></div></div>`)}
-      ${card("Reservation Settings",`<div class="frm"><div><label>Max reservation duration (mins)</label><input value="${s.maxDur}" oninput="setField('maxDur',this.value)"></div><div><label>Max seats per reservation</label><input value="${s.maxSeats}" oninput="setField('maxSeats',this.value)"></div><div><label>Check-in deadline (mins)</label><input value="${s.ciDeadline}" oninput="setField('ciDeadline',this.value)"></div><div><label>Cancellation window (mins)</label><input value="${s.cancelWin}" oninput="setField('cancelWin',this.value)"></div></div>`)}
-      ${card("Table Settings",`<div class="frm"><div><label>Number of tables</label><input value="${s.numTables}" oninput="setField('numTables',this.value)"></div><div><label>Default table capacity</label><input value="${s.cap}" oninput="setField('cap',this.value)"></div><div><label>Locations</label><input value="${s.locs}" oninput="setField('locs',this.value)"></div></div>`)}
-      ${card("Ordering Settings",`<div class="frm"><div><label>Pre-ordering</label><select onchange="setField('preorder',this.value)"><option${
-          s.preorder=='Enabled'?' selected':''
-        }
-        >Enabled</option><option${
-          s.preorder=='Disabled'?' selected':''
-        }
-        >Disabled</option></select></div><div><label>Food preparation time (mins)</label><input value="${s.prepTime}" oninput="setField('prepTime',this.value)"></div><div><label>Order cutoff time</label><input value="${s.cutoff}" oninput="setField('cutoff',this.value)"></div></div>`)}
-      ${card("Notification Settings",[["notifRes","Reservation alerts"],["notifOrd","Order alerts"],["notifInv","Low inventory alerts"]].map(x=>`<label style="display:flex;gap:9px;align-items:center;margin-bottom:11px;font-size:13.5px;color:var(--txt)"><input type="checkbox" ${
-          s[x[0]]?'checked':''
-        }
-        onchange="setField('${x[0]}',this.checked?1:0)" style="width:auto"> ${
-          x[1]
-        }
-        </label>`).join("")+'<button class="btn" style="margin-top:6px" onclick="saveSettings()">SAVE SETTINGS</button>')}</div>`;
-      }
-      return `<div class="adm"><aside class="side"><div class="brand"><div class="crest">NU</div><div><b style="font-size:13.5px">NU BALIWAG CANTEEN</b><div style="font-size:10px;color:#9fb3d1;letter-spacing:.6px">RESERVATION SYSTEM</div></div></div>
-      ${NAV.map(n=>`<button class="${p==n[0]?'on':''}" onclick="S.apage='${n[0]}';r()">${
-        n[1]
-      }
-      </button>`).join("")}
-      <button onclick="go('alogin')" style="margin-top:10px;color:#ffb4b4">⎋ Logout</button></aside>
-      <div class="main"><div class="topbar"><h1>${title}</h1><input placeholder="🔍  Search..."><button class="ic" style="background:#f3f6fa">🔔</button>
-       <div style="display:flex;gap:9px;align-items:center"><div class="crest" style="background:var(--navy);color:#fff;width:34px;height:34px;font-size:12px">CO</div><div><b style="font-size:13px">Cafeteria Owner</b><div class="mut" style="font-size:11px">Administrator</div></div></div></div>
-       <div class="wrap">${body}</div></div></div>${renderModal()}`;
-    }
-    const renderModal=()=>{
-      const m=S.modal;
-      if(!m)return"";
-      const F=(label,key,type)=>`<div><label>${label}</label><input ${type?`type="${type}"`:''} value="${(m.f[key]??'').toString().replace(/"/g,'&quot;')}" oninput="mset('${key}',this.value)"></div>`;
-      let inner="";
-      if(m.type=='table'){
-        inner=`<h3>${m.f.isNew?"Add New Table":"Edit Table "+m.f.origN}</h3><div class="frm">${F("Table number","n","number")}${F("Number of seats","seats","number")}${F("Location","loc")}</div>
-      <div class="mrow"><button class="btn" onclick="saveTable()">Save</button><button class="btn g" style="border-color:var(--line)" onclick="closeModal()">Cancel</button></div>`;
-      }
-      else if(m.type=='food'){
-        inner=`<h3>${m.f.isNew?"Add Food Item":"Edit "+m.f.n}</h3><div class="frm">${F("Food name","n")}${F("Price (₱)","p","number")}<div><label>Category</label><select onchange="mset('c',this.value)">${["Meals","Snacks","Drinks"].map(c=>`<option${
-          m.f.c==c?' selected':''
-        }
-        >${
-          c
-        }
-        </option>`).join("")}</select></div>${F("Icon (emoji)","e")}${F("Stock","s","number")}</div>
-      <div class="mrow"><button class="btn" onclick="saveFood()">Save</button><button class="btn g" style="border-color:var(--line)" onclick="closeModal()">Cancel</button></div>`;
-      }
-      else if(m.type=='inv'){
-        inner=`<h3>${m.f.isNew?"Add Inventory Item":"Edit "+m.f.origN}</h3><div class="frm">${F("Item name","n")}${F("Current stock","q","number")}${F("Unit","u")}${F("Minimum stock level","m","number")}</div>
-      <div class="mrow"><button class="btn" onclick="saveInv()">Save</button><button class="btn g" style="border-color:var(--line)" onclick="closeModal()">Cancel</button></div>`;
-      }
-      else if(m.type=='resview'){
-        const x=m.f;
-        inner=`<h3>Reservation ${x.id}</h3>
-      ${[["Student",x.n],["School ID",x.sid],["Table",x.t],["Seats",x.s],["Time",x.tm],["Check-in",x.ci],["Status",x.st]].map(r=>`<div class="row" style="margin-bottom:10px"><span class="mut">${
-          r[0]
-        }
-        </span><b>${
-          r[1]
-        }
-        </b></div>`).join("")}
-      <div class="mrow"><button class="btn g" style="border-color:var(--line)" onclick="closeModal()">Close</button></div>`;
-      }
-      else if(m.type=='userview'){
-        const u=m.f;
-        inner=`<h3>${u.n}</h3>
-      ${[["School ID",u.sid],["Email",u.em],["Reservations",u.res],["Orders",u.ord],["Status",u.active?"Active":"Disabled"]].map(r=>`<div class="row" style="margin-bottom:10px"><span class="mut">${
-          r[0]
-        }
-        </span><b>${
-          r[1]
-        }
-        </b></div>`).join("")}
-      <div class="mrow"><button class="btn g" style="border-color:var(--line)" onclick="closeModal()">Close</button></div>`;
-      }
-      return `<div class="modalbg" onclick="if(event.target==this)closeModal()"><div class="modalbox">${inner}</div></div>`;
-    };
-    function r(){
-      document.getElementById("app").innerHTML=S.role=='s'?student():admin()
-    }
-    setInterval(()=>{
-      if(!S.timerStarted)return;
-      if(S.left>0)S.left--;
-      const t=document.getElementById("tm");
-      if(t)t.textContent=fmt(S.left);
-      if(S.left==0){
-        const x=S.tables.find(t=>t.st=='oc');
-        if(x)x.st='av'
-      }
-    },1000);
-    r();
-  </script>
-</body>
-</html>
+/* ---------- LANDING / LOGIN (shared tabs) ---------- */
+function landing(){
+ const tabs=`<div class="authtabs"><button class="${S.role=='s'?'on':''}" onclick="S.role='s';S.loginError='';r()">🎓 Student</button><button class="${S.role=='a'?'on':''}" onclick="S.role='a';S.loginError='';r()">🏪 Cafeteria Owner</button></div>`;
+ const err=S.loginError?`<p style="color:#ff9d9d;font-size:12px;margin:8px 0 0;text-align:center">${S.loginError}</p>`:'';
+ const errA=S.loginError?`<p style="color:var(--rd);font-size:12px;margin:8px 0 0;text-align:center">${S.loginError}</p>`:'';
+ if(S.role=='s'){
+  return `<div class="authwrap"><div class="authtabswrap">${tabs}</div><div class="phone" style="background:var(--navy);justify-content:center;padding:26px;margin:0">
+   <div style="text-align:center;color:#fff">
+    <div style="width:86px;height:86px;margin:0 auto 18px;border-radius:50%;border:3px solid var(--gold);color:var(--gold);display:grid;place-items:center;font-weight:800;font-size:26px">NU</div>
+    <h1 style="font-size:26px;line-height:1.25">NU BALIWAG<br>CANTEEN</h1>
+    <p style="letter-spacing:2px;font-size:12px;margin:8px 0 26px;color:#cfdaec">TABLE RESERVATION SYSTEM</p>
+    <div style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.18);border-radius:12px;padding:6px;margin-bottom:10px"><input id="stuId" placeholder="School ID" style="background:transparent;border:0;color:#fff"></div>
+    <div style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.18);border-radius:12px;padding:6px"><input id="stuPw" type="password" placeholder="Password" style="background:transparent;border:0;color:#fff"></div>
+    ${err}
+    <p style="text-align:right;font-size:12px;color:#cfdaec;margin:10px 0 18px">Forgot password?</p>
+    <button class="btn" style="background:transparent;border:1.5px solid var(--gold);color:#fff" onclick="attemptLogin('s')">LOGIN</button>
+    <p style="font-size:10.5px;color:#8fa4c4;margin-top:26px">© 2026 NU Baliwag. All rights reserved.</p>
+   </div></div></div>`;
+ }
+ return `<div class="authwrap"><div class="authtabswrap">${tabs}</div><div style="background:#fff;border-radius:18px;padding:34px;width:400px;max-width:92vw;box-shadow:0 20px 60px rgba(0,0,0,.3)">
+  <div style="text-align:center;margin-bottom:22px"><div class="crest" style="margin:0 auto 12px;width:52px;height:52px;font-size:17px">NU</div>
+  <b style="font-size:18px">NU BALIWAG CANTEEN</b><p class="mut" style="letter-spacing:1.5px;font-size:11px">TABLE RESERVATION SYSTEM</p>
+  <h2 style="font-size:16px;margin-top:16px">Cafeteria Owner Login</h2></div>
+  <label>Username / Email</label><input id="admEmail" style="margin-bottom:12px">
+  <label>Password</label><input id="admPw" type="password">
+  ${errA}
+  <div class="row" style="margin:14px 0 18px"><label style="margin:0;display:flex;gap:7px;align-items:center"><input type="checkbox" checked style="width:auto"> Remember Me</label><span class="mut">Forgot Password?</span></div>
+  <button class="btn" onclick="attemptLogin('a')">LOGIN</button></div></div>`;
+}
+/* ---------- STUDENT ---------- */
+function student(){
+ const head=(t,b,rt)=>`<div class="shead">${b?`<button class="ic" onclick="go('${b}')">←</button>`:`<button class="ic" onclick="toggleMenu()">☰</button>`}<h2>${t}</h2>${rt||'<div class="ic"></div>'}</div>`;
+ let h="",bar=1;
+ if(S.view=='home'){const reservation=S.res.find(item=>item.id==S.activeRes),status=reservationStatus(reservation);h=head("",0,'<button class="ic" onclick="toggleNotif()">🔔</button>').replace('<h2></h2>',`<div style="flex:1"><b style="font-size:16px">Hello, ${S.user.name}!</b><div style="font-size:11.5px;color:#cfdaec">Student</div></div>`)+
+  `<div class="sbody">${S.sel?`<div class="card"><div class="ttl">Current Reservation</div>
+   <div class="row"><b style="font-size:21px">Table ${S.sel}</b><span class="badge ${reservationBadgeClass(status)}">${status}</span></div>
+   ${reservation?`<p class="mut" style="margin-top:6px">${reservation.tm}</p>`:''}
+   <p class="mut" style="margin:12px 0 4px">${S.timerStarted?"Dining time remaining:":"Dining timer:"}</p>${S.timerStarted?`<div class="timer" id="tm">${fmt(S.left)}</div><button class="btn g" style="margin-top:12px" onclick="finishDiningTimer()">DONE EATING</button>`:`<div class="timer" style="color:var(--mut);font-size:20px">Starts once order is completed</div>`}
+   <button class="btn" style="margin-top:${S.timerStarted?"10px":"12px"}" onclick="go('mine')">View Reservation</button></div>`:`<div class="card" style="text-align:center"><div class="ttl">Current Reservation</div>
+   <p class="mut" style="margin:6px 0 12px">You have no active table reservation.</p>
+   <button class="btn" onclick="go('reserve')">RESERVE A TABLE</button></div>`}
+   <div class="ttl" style="margin-left:2px">Quick Actions</div><div class="qa">
+   <div onclick="go('reserve')"><span>🪑</span>Reserve Table</div><div onclick="go('menu')"><span>📖</span>Browse Menu</div><div onclick="go('orders')"><span>🧾</span>My Orders</div></div>
+   <div class="ttl" style="margin:16px 0 8px 2px">Announcements</div>
+   ${S.ann.map(a=>`<div class="card" style="padding:13px"><div class="row"><div><b style="font-size:13.5px">${a.t}</b><div class="mut">${a.d}</div></div><span class="mut">${a.w}</span></div></div>`).join("")}</div>`;}
+ else if(S.view=='reserve'){const t=S.resSel?S.tables.find(x=>x.n==S.resSel):null,slotList=reservationSlots().map(start=>{const slot=String(start),full=isSlotFull(S.resDate,slot),selected=S.resSlot==slot,available=S.tables.filter(table=>table.st!="ds"&&!reservationsForSlot(S.resDate,slot,table.n).length).length;return `<button class="slot-option ${selected?'selected':''} ${full?'full':''}" ${full?'disabled':''} aria-pressed="${selected}" onclick="S.resSlot='${slot}';S.resSel=null;r(true)"><span>${reservationSlotLabel(slot)}</span><span class="slot-state">${full?'FULL':selected?'✓ Selected':`Available · ${available} tables`}</span></button>`}).join("");
+  h=head("Select a Table",'home')+`<div class="sbody">
+   <div class="card date-picker"><label for="reservationDate">Reservation Date</label><input id="reservationDate" type="date" min="${localDateInput()}" value="${S.resDate}" onchange="S.resDate=this.value;S.resSlot=null;S.resSel=null;r(true)"></div>
+   <div class="card"><div class="ttl">Reservation Time</div><div class="slot-list">${slotList}</div></div>
+   <p style="text-align:center;font-weight:600;font-size:13px;margin-bottom:6px">Choose an available table</p>
+   <div class="leg"><span><i class="dot" style="background:var(--gr)"></i>Available</span><span><i class="dot" style="background:var(--or)"></i>Reserved</span><span><i class="dot" style="background:var(--rd)"></i>Occupied</span></div>
+  <div class="card"><div class="seatgrid">${S.tables.map(table=>{const status=tableStatusForSlot(table),booked=Boolean(S.resSlot)&&reservationsForSlot(S.resDate,S.resSlot,table.n).length>0,disabled=!S.resSlot||isSlotFull(S.resDate,S.resSlot)||booked||table.st=="ds";return `<button class="tbl ${tCls[status]} ${S.resSel==table.n?'sel':''}" ${disabled?'disabled':''} aria-label="Table ${table.n}, ${stName[status]}" onclick="${disabled?'':`S.resSel=${table.n};r(true)`}">${table.n}</button>`}).join("")}</div></div>
+   ${t?`<div class="card"><div class="row"><b style="font-size:17px">Table ${t.n}</b><span class="badge ${stCls[tableStatusForSlot(t)]}">${stName[tableStatusForSlot(t)]}</span></div>
+    <div class="row" style="margin:12px 0"><span class="mut">👥 ${t.seats} Seats</span><span class="mut">📍 ${t.loc}</span><span class="mut">⏱ 20 mins</span></div>
+    <button class="btn" ${!S.resSlot||isSlotFull(S.resDate,S.resSlot)||reservationsForSlot(S.resDate,S.resSlot,t.n).length?'disabled':''} onclick="${Object.keys(S.cart).length?`go('summary',${t.n})`:`reserveTable(${t.n})`}">${Object.keys(S.cart).length?'CONTINUE TO ORDER':'RESERVE TABLE'}</button></div>`:`<p class="mut" style="text-align:center">Select a date and time slot before choosing a table.</p>`}</div>`;}
+ else if(S.view=='menu'){const list=S.menu.filter(m=>(S.cat=='All'||m.c==S.cat)&&m.n.toLowerCase().includes(S.menuQuery.toLowerCase()));
+  h=head("Menu",'home',`<button class="ic" onclick="${S.sel?'go(\'summary\')':'go(\'reserve\')'}">🛒</button>`)+`<div class="sbody">
+   <input placeholder="🔍  Search food or drinks..." value="${S.menuQuery.replace(/"/g,'&quot;')}" oninput="S.menuQuery=this.value;r()" style="margin-bottom:12px">
+  <div class="chips">${MENU_CATEGORIES.map(c=>`<button class="${S.cat==c?'on':''}" onclick="S.cat='${c}';r()">${c}</button>`).join("")}</div>
+  ${list.map(m=>`<div class="food"><div class="thumb">${menuThumb(m)}</div><div style="flex:1"><b style="font-size:14px">${m.n}</b><div class="mut">${P(m.p)}${m.av?"":" · Unavailable"}</div></div>
+    ${!m.av?'<span class="badge b-r">Sold out</span>':S.cart[m.id]?`<div class="qty"><button onclick="qty(${m.id},-1)">−</button>${S.cart[m.id]}<button onclick="qty(${m.id},1)">+</button></div>`:`<button class="btn sm" onclick="qty(${m.id},1)">Add</button>`}</div>`).join("")||'<p class="mut" style="text-align:center;margin-top:20px">No matching items.</p>'}
+  <button class="btn" onclick="${S.sel?'go(\'summary\')':'go(\'reserve\')'}">VIEW CART · ${P(total())}</button></div>`;}
+ else if(S.view=='summary'){const t=S.tables.find(x=>x.n==S.sel);
+  h=head("Summary",'menu')+`<div class="sbody"><div class="card"><div class="ttl">Reservation Details</div>
+   <div class="row" style="margin-bottom:8px"><span class="mut">Table</span><b>${t.n}</b></div>
+   <div class="row" style="margin-bottom:8px"><span class="mut">Seats</span><b>${t.seats}</b></div>
+   <div class="row" style="margin-bottom:8px"><span class="mut">Date</span><b>${formatReservationDate(S.resDate)}</b></div>
+   <div class="row" style="margin-bottom:8px"><span class="mut">Time</span><b>${reservationSlotLabel(S.resSlot)}</b></div>
+  <div class="row" style="margin-bottom:8px"><span class="mut">Reservation valid for</span><b>20:00 minutes</b></div>
+   <div class="row"><span class="mut">Please check-in before</span><b>${formatSlotTime(Number(S.resSlot))}</b></div></div>
+   <div class="card"><div class="ttl">Order Summary</div>
+   ${Object.entries(S.cart).map(([id,q])=>{const m=S.menu.find(x=>x.id==+id);return `<div class="row" style="margin-bottom:9px"><span>${q} &nbsp; ${m.n}</span><b>${P(m.p*q)}</b></div>`}).join("")||'<p class="mut">Cart is empty.</p>'}
+   <div class="row" style="border-top:1px solid var(--line);padding-top:11px;margin-top:11px"><b>Total</b><b style="font-size:17px">${P(total())}</b></div></div>
+   <div class="card"><div class="ttl">Payment Method</div>
+   <div class="chips" style="margin:0">${["GCash","Maya","Card","Cash"].map(p=>`<button class="${S.payMethod==p?'on':''}" onclick="S.payMethod='${p}';r()">${p=='Cash'?'💵':p=='Card'?'💳':'📱'} ${p}</button>`).join("")}</div>
+   <p class="mut" style="margin-top:8px">${S.payMethod=='Cash'?'You will pay at the counter upon check-in.':`You'll be redirected to a simulated ${S.payMethod} payment.`}</p></div>
+   <button class="btn" onclick="payAndConfirm(${t.n})">${S.payMethod=='Cash'?'CONFIRM RESERVATION & ORDER':'PAY & CONFIRM RESERVATION'}</button></div>
+   ${S.paying?`<div class="modalbg"><div class="modalbox" style="text-align:center"><div style="font-size:38px;margin-bottom:10px">⏳</div><b>Processing payment via ${S.payMethod}...</b><p class="mut" style="margin-top:6px">Please wait, do not close this screen.</p></div></div>`:''}`;}
+ else if(S.view=='mine'){if(!S.sel){h=head("My Reservation",'home')+`<div class="sbody"><div class="card" style="text-align:center">
+   <p class="mut" style="margin-bottom:12px">You don't have an active reservation right now.</p>
+   <button class="btn" onclick="go('reserve')">RESERVE A TABLE</button></div></div>`;}
+  else{const tn=S.sel,t=S.tables.find(x=>x.n==tn),o=S.activeOrder?S.ord.find(x=>x.id==S.activeOrder):null,reservation=S.res.find(item=>item.id==S.activeRes),status=reservationStatus(reservation);
+  h=head("My Reservation",'home')+`<div class="sbody">
+   <div class="card" style="background:${status=='Occupied'?'var(--rdb)':'var(--orb)'};border-color:${status=='Occupied'?'#f3a5a5':'#f1d88e'}"><div class="row"><b style="color:${status=='Occupied'?'var(--rd)':'#9a6b00'}">${status=='Occupied'?'Occupied / Serving':'Reservation Confirmed'}</b><span class="badge ${reservationBadgeClass(status)}">${status}</span></div>
+    <div class="row" style="margin-top:8px"><div><b style="font-size:21px">Table ${tn}</b><div class="mut">👥 ${t?t.seats:4} Seats</div><div class="mut">${reservation?.tm||''}</div></div><span style="font-size:34px">🪑</span></div></div>
+   <div class="card" style="text-align:center">${S.timerStarted?`<p class="mut">Dining time remaining</p><div class="timer" id="tm">${fmt(S.left)}</div>
+    <button class="btn g" style="margin-top:12px" onclick="finishDiningTimer()">DONE EATING</button>
+    <p class="mut" style="margin-top:8px">Please settle your dining before the time expires.</p>`:`<p class="mut">Dining timer</p><div class="timer" style="color:var(--mut);font-size:26px">Not started yet</div>
+    <p class="mut" style="margin-top:6px">The countdown will start once the cafeteria marks your order as <b>Completed</b>.</p>`}</div>
+   <div class="card"><div class="ttl">Order Status</div>
+  ${!o||o.it=="No pre-order"?'<p class="mut">No food pre-ordered for this reservation.</p>':o.it.split(", ").map((x,i)=>`<div class="food" style="box-shadow:none;margin-bottom:8px"><div class="thumb">${["🍗","🧋","🥘","🍟","🍌"][i%5]}</div><div style="flex:1"><b style="font-size:13.5px">${x}</b><div class="mut" style="color:${o.st=='Ready'?'var(--gr)':o.st=='Completed'?'var(--navy)':'var(--or)'};font-weight:700">${o.st}</div><div class="mut">Estimated ready: 11:50 AM</div></div></div>`).join("")}</div>
+  ${status=='Occupied'?'':`<button class="btn d" onclick="cancelReservation(${tn})">CANCEL RESERVATION</button>`}</div>`;}}
+ else if(S.view=='orders'){const orders=studentOrders();h=head("My Orders",0,'<button class="ic" onclick="toggleNotif()">🔔</button>')+`<div class="sbody"><div class="ttl">Current Order</div>
+  ${orders.length?`<div class="card"><div class="row"><b>${orders[0].id}</b><span class="badge b-o">${orders[0].st}</span></div><p class="mut" style="margin:6px 0">${orders[0].it}</p><div class="row"><span class="mut">Table ${orders[0].t} · ${orders[0].tm}</span><b>${P(orders[0].tot)}</b></div></div>`:'<div class="card"><p class="mut">You have no orders yet.</p></div>'}
+  <div class="ttl">Previous Orders</div>
+  ${orders.slice(1).map(o=>`<div class="card"><div class="row"><b>${o.id}</b><span class="badge ${o.st=='Completed'?'b-g':'b-o'}">${o.st}</span></div><p class="mut" style="margin:6px 0">${o.it}</p><div class="row"><span class="mut">Table ${o.t} · ${o.tm}</span><b>${P(o.tot)}</b></div></div>`).join("")||'<div class="card"><p class="mut">No previous orders.</p></div>'}
+  <div class="ttl">Reservation History</div>
+  ${S.res.slice(0,3).map(x=>{const status=reservationStatus(x);return `<div class="card" style="padding:12px"><div class="row"><b>Table ${x.t}</b><span class="badge ${reservationBadgeClass(status)}">${status}</span></div><div class="mut">${x.tm} · ${x.s} seats</div></div>`}).join("")}</div>`;}
+ else if(S.view=='profile'){h=head("Profile",0,'<button class="ic" onclick="toggleNotif()">🔔</button>')+`<div class="sbody"><div class="card" style="text-align:center">
+  <div style="width:74px;height:74px;border-radius:50%;background:var(--navy);color:#fff;display:grid;place-items:center;font-size:26px;font-weight:700;margin:0 auto 10px">JD</div>
+  <b style="font-size:18px">${S.user.name}</b><div class="mut">Student · College of Engineering</div></div>
+  <div class="card">${[["School ID",S.user.id],["Email",S.user.email],["Contact",S.user.phone],["Campus","NU Baliwag"]].map(x=>`<div class="row" style="margin-bottom:11px"><span class="mut">${x[0]}</span><b style="font-size:13px">${x[1]}</b></div>`).join("")}</div>
+  <div class="card">${["Edit Profile","Notification Settings","Help & Support"].map(x=>`<div class="row" style="margin-bottom:12px"><span>${x}</span><span class="mut">›</span></div>`).join("")}</div>
+  <button class="btn d" onclick="logout()">LOGOUT</button></div>`;}
+ else {bar=0;h=head("Page",'home')+'<div class="sbody"></div>'}
+ const nav=bar?`<div class="bnav">${[["home","🏠","Home"],["reserve","🪑","Reservation"],["orders","🧾","Orders"],["profile","👤","Profile"]].map(n=>`<button class="${S.tab==n[0]?'on':''}" onclick="go('${n[0]}')"><span>${n[1]}</span>${n[2]}</button>`).join("")}</div>`:"";
+ const drawer=S.menuOpen?`<div class="backdrop" onclick="toggleMenu()"></div><div class="drawer">
+  <div class="dhead"><div class="crest" style="background:var(--gold);color:var(--navy)">JD</div><div><b style="font-size:14px">${S.user.name}</b><div class="mut" style="font-size:11px">${S.user.id}</div></div></div>
+  <nav>
+   <button onclick="go('home')">🏠 &nbsp;Home</button>
+   <button onclick="go('reserve')">🪑 &nbsp;Reserve Table</button>
+   <button onclick="go('menu')">📖 &nbsp;Browse Menu</button>
+   <button onclick="go('mine')">⏱ &nbsp;My Reservation</button>
+   <button onclick="go('orders')">🧾 &nbsp;My Orders</button>
+   <button onclick="go('profile')">👤 &nbsp;Profile</button>
+  </nav>
+  <button class="btn d" style="margin-top:auto" onclick="logout()">⎋ Logout</button>
+ </div>`:"";
+ const notifs=notifList();
+ const panel=S.notifOpen?`<div class="backdrop" onclick="toggleNotif()"></div><div class="notifpanel">
+  <div class="ttl" style="margin-bottom:2px">Notifications</div>
+  ${notifs.map(n=>`<div class="nitem"><span>${n.ic}</span><div><b style="font-size:12.5px">${n.t}</b><div class="mut" style="font-size:11px">${n.w}</div></div></div>`).join("")}
+ </div>`:"";
+ return `<div class="phone">${h}${nav}${drawer}${panel}</div>`;
+}
+/* ---------- ADMIN ---------- */
+const NAV=[["dash","📊 Dashboard"],["res","📅 Reservations"],["tables","🪑 Table Management"],["ord","🧾 Orders"],["menu","🍽 Food Menu"],["inv","📦 Inventory"],["ann","📣 Announcements"],["rep","📈 Reports"],["users","👥 Users"],["set","⚙ Settings"]];
+const card=(t,b,w)=>`<div class="card" style="${w||''}">${t?`<div class="ttl">${t}</div>`:''}${b}</div>`;
+function admin(){
+ const p=S.apage;let body="",title=NAV.find(n=>n[0]==p)[1].slice(2);
+ if(p=='dash'){body=`<div class="stats">
+  ${[["Total Tables",S.tables.length],["Available",cnt('av')],["Reserved",cnt('rs')],["Occupied",cnt('oc')],["Today's Reservations",S.res.length],["Pending Orders",S.ord.filter(o=>o.st=='Pending'||o.st=='Preparing').length],["Today's Sales",P(885)]].map(s=>`<div class="stat"><span class="mut">${s[0]}</span><b>${s[1]}</b></div>`).join("")}</div>
+  <div class="cols">${card("Cafeteria Status Overview",`${stallsRow}<div class="leg" style="justify-content:flex-start"><span><i class="dot" style="background:var(--gr)"></i>Available</span><span><i class="dot" style="background:var(--or)"></i>Reserved</span><span><i class="dot" style="background:var(--rd)"></i>Occupied</span></div><div class="seatgrid" style="margin:0">${S.tables.map(t=>`<div class="tbl ${tCls[t.st]}">${t.n}</div>`).join("")}</div>`)}
+  <div>${card("Today's Reservations",`<table>${S.res.map(x=>{const status=reservationStatus(x);return `<tr><td><b>${x.n}</b><div class="mut">Table ${x.t} · ${x.tm}</div></td><td style="text-align:right"><span class="badge ${reservationBadgeClass(status)}">${status}</span></td></tr>`}).join("")}</table>`)}
+  ${card("Recent Orders",`<table>${S.ord.map(o=>`<tr><td><b>${o.id}</b><div class="mut">${o.n} · Table ${o.t}</div></td><td style="text-align:right"><b>${P(o.tot)}</b><div class="mut">${o.st}</div></td></tr>`).join("")}</table>`)}
+  ${card("Popular Food Items",S.menu.slice(0,4).map((m,i)=>`<div style="margin-bottom:11px"><div class="row"><span>${m.e} ${m.n}</span><b class="mut">${[38,31,22,17][i]} orders</b></div><div class="bar"><i style="width:${[100,82,58,45][i]}%"></i></div></div>`).join(""))}</div></div>`;}
+ else if(p=='tables'){body=`<div class="row" style="margin-bottom:14px"><p class="mut">Click a table to change its status.</p><button class="btn sm" style="background:var(--navy);color:#fff" onclick="openModal('table',{isNew:true,n:S.tables.length?Math.max(...S.tables.map(t=>t.n))+1:1,seats:4,loc:'Center Aisle'})">+ Add New Table</button></div>
+  <div class="gridc">${S.tables.map(t=>`<div class="card" style="margin:0"><div class="row"><b>Table ${t.n}</b><span class="badge ${stCls[t.st]}">${stName[t.st]}</span></div>
+   <div class="mut" style="margin:7px 0 11px">👥 ${t.seats} seats · 📍 ${t.loc}</div>
+   <div style="display:flex;gap:6px;flex-wrap:wrap">${[["av","Available"],["rs","Reserved"],["oc","Occupied"]].map(x=>`<button class="btn sm g" style="border-color:var(--line)" onclick="setStatus(${t.n},'${x[0]}')">${x[1]}</button>`).join("")}<button class="btn sm g" style="border-color:var(--line)" onclick="toggleDisableTable(${t.n})">${t.st=='ds'?'Enable':'Disable'}</button><button class="btn sm g" style="border-color:var(--line)" onclick="openModal('table',{isNew:false,origN:${t.n},n:${t.n},seats:${t.seats},loc:'${t.loc}'})">Edit</button><button class="btn sm d" onclick="deleteTable(${t.n})">Delete</button></div></div>`).join("")}</div>`;}
+ else if(p=='res'){const rows=filteredRes();
+  body=`<div class="row" style="margin-bottom:14px;gap:10px"><input placeholder="Search reservation or student..." style="max-width:300px" value="${S.resFilter.q}" oninput="setResFilter('q',this.value)"><select style="max-width:170px" onchange="setResFilter('status',this.value)">${["All","Reserved","Occupied","Cancelled","Expired"].map(s=>`<option${S.resFilter.status==s?' selected':''}>${s=='All'?'All statuses':s}</option>`).join("")}</select></div>
+  ${card(`Reservations (${rows.length})`,`<table><tr><th>ID</th><th>Student</th><th>School ID</th><th>Table</th><th>Seats</th><th>Time</th><th>Check-in</th><th>Status</th><th>Actions</th></tr>
+  ${rows.map(x=>{const status=reservationStatus(x);return `<tr><td><b>${x.id}</b></td><td>${x.n}</td><td class="mut">${x.sid}</td><td>${x.t}</td><td>${x.s}</td><td>${x.tm}</td><td><span class="badge ${x.ci=='Checked-in'?'b-g':x.ci=='No show'?'b-r':'b-n'}">${x.ci}</span></td><td><span class="badge ${reservationBadgeClass(status)}">${status}</span></td>
+  <td style="white-space:nowrap">${x.ci=='Pending'?`<button class="btn sm" onclick="checkin('${x.id}')">Check-in</button> `:''}<button class="btn sm g" style="border-color:var(--line)" onclick='openModal("resview",${JSON.stringify(x)})'>View</button></td></tr>`}).join("")||'<tr><td colspan="9" class="mut" style="text-align:center;padding:20px">No matching reservations.</td></tr>'}</table>`)}`;}
+ else if(p=='ord'){const F={Pending:["Start Preparing","Preparing"],Preparing:["Mark as Ready","Ready"],Ready:["Complete Order","Completed"]};
+  const rowHtml=o=>`<tr><td><b>${o.id}</b></td><td>${o.n}</td><td>${o.t}</td><td class="mut">${o.it}</td><td><b>${P(o.tot)}</b></td><td>${o.tm}</td>
+  <td><span class="badge ${o.st=='Completed'?'b-g':o.st=='Cancelled'?'b-r':o.st=='Ready'?'b-n':'b-o'}">${o.st}</span></td>
+  <td style="white-space:nowrap">${F[o.st]?`<button class="btn sm" onclick="setOrd('${o.id}','${F[o.st][1]}')">${F[o.st][0]}</button> `:''}${o.st=='Completed'||o.st=='Cancelled'?'—':`<button class="btn sm d" onclick="setOrd('${o.id}','Cancelled')">Cancel</button>`}</td></tr>`;
+  const active=S.ord.filter(o=>o.st!='Completed'&&o.st!='Cancelled'),done=S.ord.filter(o=>o.st=='Completed'||o.st=='Cancelled');
+  body=card("Active Orders",`<table><tr><th>Order ID</th><th>Student</th><th>Table</th><th>Items</th><th>Total</th><th>Time</th><th>Status</th><th>Actions</th></tr>
+  ${active.map(rowHtml).join("")||'<tr><td colspan="8" class="mut" style="text-align:center;padding:20px">No active orders right now.</td></tr>'}</table>`)+
+  `<div class="row" style="margin:14px 0 8px;cursor:pointer" onclick="S.showDoneOrders=!S.showDoneOrders;r()"><b style="font-size:13px">Completed / Cancelled History (${done.length})</b><span class="mut">${S.showDoneOrders?'Hide ▲':'Show ▼'}</span></div>`+
+  (S.showDoneOrders?card("",`<table><tr><th>Order ID</th><th>Student</th><th>Table</th><th>Items</th><th>Total</th><th>Time</th><th>Status</th><th>Actions</th></tr>${done.map(rowHtml).join("")||'<tr><td colspan="8" class="mut" style="text-align:center;padding:16px">No completed orders yet.</td></tr>'}</table>`):'');}
+ else if(p=='menu'){body=`<div class="row" style="margin-bottom:14px"><div class="chips" style="margin:0">${MENU_CATEGORIES.map(c=>`<button class="${S.cat==c?'on':''}" onclick="S.cat='${c}';r()">${c}</button>`).join("")}</div><button class="btn sm" style="background:var(--navy);color:#fff" onclick="openModal('food',{isNew:true,n:'',p:0,c:'Main Courses',e:'🍽️',s:0,min:10})">+ Add Food</button></div>
+  <div class="gridc">${S.menu.filter(m=>S.cat=='All'||m.c==S.cat).map(m=>`<div class="card" style="margin:0"><div class="row"><div class="thumb" style="width:52px;height:52px">${menuThumb(m)}</div><span class="badge ${m.av?'b-g':'b-r'}">${m.av?'Available':'Unavailable'}</span></div>
+   <b style="display:block;margin:10px 0 3px">${m.n}</b><div class="mut">${m.c} · Stock: ${m.s}</div><b style="display:block;margin:6px 0 10px;font-size:17px">${P(m.p)}</b>
+   <div style="display:flex;gap:6px;flex-wrap:wrap"><button class="btn sm g" style="border-color:var(--line)" onclick='openModal("food",{isNew:false,id:${m.id},n:"${m.n}",p:${m.p},c:"${m.c}",e:"${m.e}",s:${m.s},min:${m.min}})'>Edit</button><button class="btn sm g" style="border-color:var(--line)" onclick="S.menu.find(x=>x.id==${m.id}).av^=1;r()">${m.av?'Disable':'Enable'}</button><button class="btn sm d" onclick="deleteFood(${m.id})">Delete</button></div></div>`).join("")}</div>`;}
+ else if(p=='inv'){const low=S.menu.filter(i=>i.s<=i.min),inventoryCategories=["Main Courses","Side Courses","Beverages","Biscuits & Snacks"];
+  body=(low.length?`<div class="card" style="border-left:4px solid var(--or);background:var(--orb)"><b>⚠ Low stock warning</b><p class="mut">${low.map(i=>i.n).join(", ")} ${low.length>1?'are':'is'} at or below the minimum stock level.</p></div>`:'')+
+  `<div class="row" style="margin-bottom:14px"><p class="mut">Stock mirrors your Food Menu items — meals, snacks, and drinks. Add or remove products in Food Menu Management.</p></div>
+  ${inventoryCategories.map(category=>card(category,`<table><tr><th>Item</th><th>Current Stock</th><th>Min. Level</th><th>Status</th><th>Actions</th></tr>
+  ${S.menu.filter(i=>i.c==category).map(i=>{const st=i.s==0?["Out of Stock","b-r"]:i.s<=i.min?["Low Stock","b-o"]:["In Stock","b-g"];return `<tr><td><b>${i.e} ${i.n}</b></td><td>${i.s}</td><td>${i.min}</td><td><span class="badge ${st[1]}">${st[0]}</span></td>
+  <td style="white-space:nowrap"><button class="btn sm g" style="border-color:var(--line)" onclick="restock(${i.id},10)">+10</button> <button class="btn sm g" style="border-color:var(--line)" onclick='openModal("stock",{id:${i.id},n:"${i.n}",s:${i.s},min:${i.min}})'>Update Stock</button></td></tr>`}).join("")||'<tr><td colspan="5" class="mut" style="text-align:center;padding:16px">No products in this category.</td></tr>'}</table>`)).join("")}`;
+ }
+ else if(p=='ann'){body=`<div class="cols">${card(S.annEdit!==null?"Edit Announcement":"Create Announcement",`<label>Title</label><input value="${S.annForm.t.replace(/"/g,'&quot;')}" oninput="annField('t',this.value)" placeholder="e.g. Cafeteria closing early" style="margin-bottom:12px">
+  <label>Message</label><textarea rows="4" oninput="annField('d',this.value)" placeholder="Details shown on the student dashboard...">${S.annForm.d}</textarea>
+  <div class="frm" style="margin:14px 0"><div><label>Type</label><select onchange="annField('type',this.value)"><option${S.annForm.type=='General'?' selected':''}>General</option><option${S.annForm.type=='Closing time'?' selected':''}>Closing time</option><option${S.annForm.type=='Menu change'?' selected':''}>Menu change</option><option${S.annForm.type=='Maintenance'?' selected':''}>Maintenance</option><option${S.annForm.type=='Holiday schedule'?' selected':''}>Holiday schedule</option></select></div><div><label>Schedule label</label><input value="${S.annForm.w.replace(/"/g,'&quot;')}" oninput="annField('w',this.value)" placeholder="e.g. Today, Sep 20"></div></div>
+  <div style="display:flex;gap:8px"><button class="btn" onclick="annPublish()">${S.annEdit!==null?"SAVE CHANGES":"PUBLISH ANNOUNCEMENT"}</button>${S.annEdit!==null?'<button class="btn g" style="border-color:var(--line)" onclick="annCancelEdit()">Cancel</button>':''}</div>`)}
+  ${card("Published",S.ann.length?S.ann.map((a,i)=>`<div style="border-bottom:1px solid var(--line);padding-bottom:11px;margin-bottom:11px"><div class="row"><b style="font-size:13.5px">${a.t}</b><span class="mut">${a.w}</span></div><p class="mut" style="margin:4px 0 8px">${a.d}</p><button class="btn sm g" style="border-color:var(--line)" onclick="annEditStart(${i})">Edit</button> <button class="btn sm d" onclick="annDelete(${i})">Delete</button></div>`).join(""):'<p class="mut">No announcements yet.</p>')}</div>`;}
+ else if(p=='rep'){const RD={Today:{s:[["Reservations today",52],["Food Orders",68],["Revenue",P(7940)],["Avg. table usage","64%"]],D:[6,9,14,11,7,3,2],p:[22,17,12,9]},
+  "This Week":{s:[["Reservations this week",349],["Food Orders",412],["Revenue",P(48620)],["Avg. table usage","72%"]],D:[42,55,38,61,74,49,30],p:[128,96,74,61]},
+  "This Month":{s:[["Reservations this month",1480],["Food Orders",1795],["Revenue",P(206400)],["Avg. table usage","69%"]],D:[210,245,198,268],p:[540,410,320,255]},
+  "Custom Date":{s:[["Reservations in range",0],["Food Orders",0],["Revenue",P(0)],["Avg. table usage","—"]],D:[0,0,0,0,0,0,0],p:[0,0,0,0]}};
+  const rd=RD[S.repFilter],W=S.repFilter=="This Month"?["Wk 1","Wk 2","Wk 3","Wk 4"]:["Mon","Tue","Wed","Thu","Fri","Sat","Sun"].slice(0,rd.D.length),mx=Math.max(1,...rd.D);
+  body=`<div class="chips" style="margin-bottom:14px">${["Today","This Week","This Month","Custom Date"].map(c=>`<button class="${S.repFilter==c?'on':''}" onclick="S.repFilter='${c}';r()">${c}</button>`).join("")}</div>
+  <div class="stats">${rd.s.map(s=>`<div class="stat"><span class="mut">${s[0]}</span><b>${s[1]}</b></div>`).join("")}</div>
+  <div class="cols">${card("Daily Reservations",`<div class="chart">${rd.D.map((v,i)=>`<div style="height:${Math.max(4,v/mx*100)}%"><b>${v}</b><span>${W[i]||''}</span></div>`).join("")}</div><div style="height:22px"></div>`)}
+  <div>${card("Most Ordered Food",S.menu.slice(0,4).map((m,i)=>`<div style="margin-bottom:11px"><div class="row"><span>${m.n}</span><b class="mut">${rd.p[i]}</b></div><div class="bar"><i style="width:${Math.max(2,rd.p[i]/Math.max(1,rd.p[0])*100)}%"></i></div></div>`).join(""))}
+  ${card("Peak Reservation Times",`<table>${[["11:00 – 12:00","Very High"],["12:00 – 13:00","High"],["15:00 – 16:00","Moderate"],["17:00 – 18:00","Low"]].map(x=>`<tr><td>${x[0]}</td><td style="text-align:right"><span class="badge ${x[1]=='Low'?'b-n':x[1]=='Moderate'?'b-o':'b-g'}">${x[1]}</span></td></tr>`).join("")}</table>`)}</div></div>`;}
+ else if(p=='users'){const q=(S.resFilter.uq||"").toLowerCase(),rows=S.users.filter(u=>!q||u.n.toLowerCase().includes(q)||u.sid.includes(q));
+  body=card("Student Accounts",`<input placeholder="Search student..." style="max-width:300px;margin-bottom:14px" oninput="S.resFilter.uq=this.value;r()">
+  <table><tr><th>Name</th><th>School ID</th><th>Email</th><th>Reservations</th><th>Orders</th><th>Status</th><th>Actions</th></tr>
+  ${rows.map(u=>`<tr><td><b>${u.n}</b></td><td class="mut">${u.sid}</td><td class="mut">${u.em}</td><td>${u.res}</td><td>${u.ord}</td>
+  <td><span class="badge ${u.active?'b-g':'b-r'}">${u.active?'Active':'Disabled'}</span></td><td style="white-space:nowrap"><button class="btn sm g" style="border-color:var(--line)" onclick='openModal("userview",${JSON.stringify(u)})'>View</button> <button class="btn sm ${u.active?'d':''}" onclick="toggleUser('${u.sid}')">${u.active?'Disable':'Enable'}</button></td></tr>`).join("")}</table>`);}
+ else {const s=S.settings;body=`<div class="cols">${card("Cafeteria Information",`<div class="frm"><div><label>Cafeteria name</label><input value="${s.name}" oninput="setField('name',this.value)"></div><div><label>Operating hours</label><input value="${s.hrs}" oninput="setField('hrs',this.value)"></div><div><label>Contact number</label><input value="${s.contact}" oninput="setField('contact',this.value)"></div><div><label>Email</label><input value="${s.email}" oninput="setField('email',this.value)"></div></div>`)}
+  ${card("Reservation Settings",`<div class="frm"><div><label>Max reservation duration (mins)</label><input value="${s.maxDur}" oninput="setField('maxDur',this.value)"></div><div><label>Max seats per reservation</label><input value="${s.maxSeats}" oninput="setField('maxSeats',this.value)"></div><div><label>Check-in deadline (mins)</label><input value="${s.ciDeadline}" oninput="setField('ciDeadline',this.value)"></div><div><label>Cancellation window (mins)</label><input value="${s.cancelWin}" oninput="setField('cancelWin',this.value)"></div></div>`)}
+  ${card("Table Settings",`<div class="frm"><div><label>Number of tables</label><input value="${s.numTables}" oninput="setField('numTables',this.value)"></div><div><label>Default table capacity</label><input value="${s.cap}" oninput="setField('cap',this.value)"></div><div><label>Locations</label><input value="${s.locs}" oninput="setField('locs',this.value)"></div></div>`)}
+  ${card("Ordering Settings",`<div class="frm"><div><label>Pre-ordering</label><select onchange="setField('preorder',this.value)"><option${s.preorder=='Enabled'?' selected':''}>Enabled</option><option${s.preorder=='Disabled'?' selected':''}>Disabled</option></select></div><div><label>Food preparation time (mins)</label><input value="${s.prepTime}" oninput="setField('prepTime',this.value)"></div><div><label>Order cutoff time</label><input value="${s.cutoff}" oninput="setField('cutoff',this.value)"></div></div>`)}
+  ${card("Notification Settings",[["notifRes","Reservation alerts"],["notifOrd","Order alerts"],["notifInv","Low inventory alerts"]].map(x=>`<label style="display:flex;gap:9px;align-items:center;margin-bottom:11px;font-size:13.5px;color:var(--txt)"><input type="checkbox" ${s[x[0]]?'checked':''} onchange="setField('${x[0]}',this.checked?1:0)" style="width:auto"> ${x[1]}</label>`).join("")+'<button class="btn" style="margin-top:6px" onclick="saveSettings()">SAVE SETTINGS</button>')}</div>`;}
+ return `<div class="adm"><aside class="side"><div class="brand"><div class="crest">NU</div><div><b style="font-size:13.5px">NU BALIWAG CANTEEN</b><div style="font-size:10px;color:#9fb3d1;letter-spacing:.6px">RESERVATION SYSTEM</div></div></div>
+  ${NAV.map(n=>`<button class="${p==n[0]?'on':''}" onclick="S.apage='${n[0]}';r()">${n[1]}</button>`).join("")}
+  <button onclick="logout()" style="margin-top:10px;color:#ffb4b4">⎋ Logout</button></aside>
+  <div class="main"><div class="topbar"><h1>${title}</h1><input placeholder="🔍  Search..."><button class="ic" style="background:#f3f6fa">🔔</button>
+   <div style="display:flex;gap:9px;align-items:center"><div class="crest" style="background:var(--navy);color:#fff;width:34px;height:34px;font-size:12px">CO</div><div><b style="font-size:13px">Cafeteria Owner</b><div class="mut" style="font-size:11px">Administrator</div></div></div></div>
+   <div class="wrap">${body}</div></div></div>${renderModal()}`;
+}
+const renderModal=()=>{
+ const m=S.modal;if(!m)return"";
+ const F=(label,key,type)=>`<div><label>${label}</label><input ${type?`type="${type}"`:''} value="${(m.f[key]??'').toString().replace(/"/g,'&quot;')}" oninput="mset('${key}',this.value)"></div>`;
+ let inner="";
+ if(m.type=='table'){inner=`<h3>${m.f.isNew?"Add New Table":"Edit Table "+m.f.origN}</h3><div class="frm">${F("Table number","n","number")}${F("Number of seats","seats","number")}${F("Location","loc")}</div>
+  <div class="mrow"><button class="btn" onclick="saveTable()">Save</button><button class="btn g" style="border-color:var(--line)" onclick="closeModal()">Cancel</button></div>`;}
+ else if(m.type=='food'){inner=`<h3>${m.f.isNew?"Add Food Item":"Edit "+m.f.n}</h3><div class="frm">${F("Food name","n")}${F("Price (₱)","p","number")}<div><label>Category</label><select onchange="mset('c',this.value)">${MENU_CATEGORIES.filter(c=>c!="All").map(c=>`<option${m.f.c==c?' selected':''}>${c}</option>`).join("")}</select></div>${F("Icon (emoji)","e")}${F("Starting stock","s","number")}${F("Minimum stock level","min","number")}</div>
+  <div class="mrow"><button class="btn" onclick="saveFood()">Save</button><button class="btn g" style="border-color:var(--line)" onclick="closeModal()">Cancel</button></div>`;}
+ else if(m.type=='stock'){inner=`<h3>Update Stock — ${m.f.n}</h3><div class="frm">${F("Current stock","s","number")}${F("Minimum stock level","min","number")}</div>
+  <div class="mrow"><button class="btn" onclick="saveStock()">Save</button><button class="btn g" style="border-color:var(--line)" onclick="closeModal()">Cancel</button></div>`;}
+ else if(m.type=='resview'){const x=m.f,status=reservationStatus(x);inner=`<h3>Reservation ${x.id}</h3>
+  ${[["Student",x.n],["School ID",x.sid],["Table",x.t],["Seats",x.s],["Date",x.date?formatReservationDate(x.date):"—"],["Time",x.slot?reservationSlotLabel(x.slot):x.tm],["Check-in",x.ci],["Status",status]].map(r=>`<div class="row" style="margin-bottom:10px"><span class="mut">${r[0]}</span><b>${r[1]}</b></div>`).join("")}
+  <div class="mrow"><button class="btn g" style="border-color:var(--line)" onclick="closeModal()">Close</button></div>`;}
+ else if(m.type=='userview'){const u=m.f;inner=`<h3>${u.n}</h3>
+  ${[["School ID",u.sid],["Email",u.em],["Reservations",u.res],["Orders",u.ord],["Status",u.active?"Active":"Disabled"]].map(r=>`<div class="row" style="margin-bottom:10px"><span class="mut">${r[0]}</span><b>${r[1]}</b></div>`).join("")}
+  <div class="mrow"><button class="btn g" style="border-color:var(--line)" onclick="closeModal()">Close</button></div>`;}
+ return `<div class="modalbg" onclick="if(event.target==this)closeModal()"><div class="modalbox">${inner}</div></div>`;
+};
+function r(preserveScroll=false){
+ const previousBody=S.role=='s'&&preserveScroll?document.querySelector('.sbody'):null;
+ const previousSlotList=previousBody?.querySelector('.slot-list');
+ const scrollTop=previousBody?previousBody.scrollTop:0;
+ const slotListScrollTop=previousSlotList?previousSlotList.scrollTop:0;
+ saveDB();
+ document.getElementById("app").innerHTML=!S.loggedIn?landing():(S.role=='s'?student():admin());
+ if(previousBody){const nextBody=document.querySelector('.sbody');if(nextBody)requestAnimationFrame(()=>{nextBody.scrollTop=scrollTop;const nextSlotList=nextBody.querySelector('.slot-list');if(nextSlotList)nextSlotList.scrollTop=slotListScrollTop})}
+}
+setInterval(()=>{if(!S.timerStarted)return;if(S.left>0)S.left--;const t=document.getElementById("tm");if(t)t.textContent=fmt(S.left);
+ if(S.left==0)finishDiningTimer()},1000);
+if(new URLSearchParams(location.search).has('admin')){S.role='a';}
+r();
+</script></body></html>

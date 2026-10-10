@@ -1,7 +1,0 @@
-{
-  "name": "nu-baliwag-canteen",
-  "private": true,
-  "scripts": {
-    "build": "node build.mjs"
-  }
-}

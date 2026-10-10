@@ -27,3 +27,7 @@ Admin login uses the email and password of an active `admin` row in `users`; the
 The API exposes `POST /api/auth/login`, `GET /api/auth/me`, `GET /api/menu`, `GET /api/tables`, student reservation and order routes, admin account/reservation/order routes, and announcement routes. Protected routes require `Authorization: Bearer <token>`.
 
 Reservation creation and order submission use database transactions. Order totals are calculated from database prices, and stock is deducted once when an administrator marks an order completed.
+
+## Cloudflare Workers static site deployment
+
+The root `wrangler.jsonc` serves only the generated `dist` directory. Run `npm run build` to copy the public `index.html` and `assets` into that directory. In Cloudflare Workers Builds, set the build command to `npm run build` and the deploy command to `npx wrangler deploy`. This prevents backend files, dependencies, and repository-only files from being uploaded as public assets.

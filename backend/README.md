@@ -41,4 +41,4 @@ $token = [Convert]::ToHexString([Security.Cryptography.RandomNumberGenerator]::G
 npx wrangler secret put USER_SETUP_TOKEN
 ```
 
-Paste the generated token when Wrangler prompts for its value. Then send a `POST` request to `/api/admin/users` with `Authorization: Bearer <token>` and JSON fields `name`, `schoolId`, `email`, and `password`. Passwords must be 12-128 characters. The endpoint can only create student accounts. Delete the secret with `npx wrangler secret delete USER_SETUP_TOKEN` after provisioning to disable the endpoint.
+Paste the generated token when Wrangler prompts for its value. Then send a `POST` request to `/api/admin/users` with `Authorization: Bearer <token>` and JSON fields `name`, `schoolId`, `email`, and `password`. Passwords must be 8-128 characters. The endpoint can only create student accounts. Delete the secret with `npx wrangler secret delete USER_SETUP_TOKEN` after provisioning to disable the endpoint.

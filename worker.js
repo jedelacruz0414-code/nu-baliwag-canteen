@@ -76,11 +76,11 @@ export default {
         schoolId.length > 40 ||
         !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) ||
         email.length > 254 ||
-        password.length < 12 ||
+        password.length < 8 ||
         password.length > 128
       ) {
         return jsonError(
-          "Provide a valid name, school ID, email, and password of 12 to 128 characters.",
+          "Provide a valid name, school ID, email, and password of 8 to 128 characters.",
           400
         );
       }

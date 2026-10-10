@@ -30,6 +30,15 @@ Reservation creation and order submission use database transactions. Order total
 
 ## Cloudflare Worker and Hyperdrive binding
 
-The root `worker.js` wraps the static site and exposes `GET /api/db-test` as a MySQL connectivity probe. It does not migrate or replace the Express API in `backend/src/server.js`. Build with `npm run build` and deploy with `npm run deploy`.
+The root `worker.js` wraps the static site, exposes `GET /api/db-test` as a MySQL connectivity probe, and supports `POST /api/admin/users` for creating student accounts. It does not migrate or replace the Express API in `backend/src/server.js`. Build with `npm run build` and deploy with `npm run deploy`.
 
 In the Cloudflare dashboard, add a Hyperdrive binding named `HYPERDRIVE` to the `nu-baliwag-canteen` Worker and connect it to the Aiven MySQL database. The Wrangler configuration enables `nodejs_compat`; no database credentials or Hyperdrive ID belong in this repository. After adding the binding, redeploy and request `/api/db-test` to verify the connection.
+
+To provision a student, create a random token in PowerShell and set it as a Worker secret:
+
+```powershell
+$token = [Convert]::ToHexString([Security.Cryptography.RandomNumberGenerator]::GetBytes(32))
+npx wrangler secret put USER_SETUP_TOKEN
+```
+
+Paste the generated token when Wrangler prompts for its value. Then send a `POST` request to `/api/admin/users` with `Authorization: Bearer <token>` and JSON fields `name`, `schoolId`, `email`, and `password`. Passwords must be 12-128 characters. The endpoint can only create student accounts. Delete the secret with `npx wrangler secret delete USER_SETUP_TOKEN` after provisioning to disable the endpoint.

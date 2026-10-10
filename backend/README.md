@@ -27,3 +27,9 @@ Admin login uses the email and password of an active `admin` row in `users`; the
 The API exposes `POST /api/auth/login`, `GET /api/auth/me`, `GET /api/menu`, `GET /api/tables`, student reservation and order routes, admin account/reservation/order routes, and announcement routes. Protected routes require `Authorization: Bearer <token>`.
 
 Reservation creation and order submission use database transactions. Order totals are calculated from database prices, and stock is deducted once when an administrator marks an order completed.
+
+## Cloudflare Worker and Hyperdrive binding
+
+The root `worker.js` wraps the static site and exposes `GET /api/db-test` as a MySQL connectivity probe. It does not migrate or replace the Express API in `backend/src/server.js`. Build with `npm run build` and deploy with `npm run deploy`.
+
+In the Cloudflare dashboard, add a Hyperdrive binding named `HYPERDRIVE` to the `nu-baliwag-canteen` Worker and connect it to the Aiven MySQL database. The Wrangler configuration enables `nodejs_compat`; no database credentials or Hyperdrive ID belong in this repository. After adding the binding, redeploy and request `/api/db-test` to verify the connection.

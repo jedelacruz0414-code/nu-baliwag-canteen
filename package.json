@@ -1,9 +1,13 @@
 {
   "name": "nu-baliwag-canteen",
   "private": true,
+  "type": "module",
   "scripts": {
     "build": "node build.mjs",
     "deploy": "wrangler deploy"
+  },
+  "dependencies": {
+    "mysql2": "^3.14.1"
   },
   "devDependencies": {
     "wrangler": "4.149.0"

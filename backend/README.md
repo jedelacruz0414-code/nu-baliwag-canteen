@@ -27,9 +27,3 @@ Admin login uses the email and password of an active `admin` row in `users`; the
 The API exposes `POST /api/auth/login`, `GET /api/auth/me`, `GET /api/menu`, `GET /api/tables`, student reservation and order routes, admin account/reservation/order routes, and announcement routes. Protected routes require `Authorization: Bearer <token>`.
 
 Reservation creation and order submission use database transactions. Order totals are calculated from database prices, and stock is deducted once when an administrator marks an order completed.
-
-## Cloudflare Pages Hyperdrive connectivity check
-
-The root-level Pages Function at `/api/db-test` checks connectivity to a MySQL database through Cloudflare Hyperdrive. Connect a Hyperdrive configuration to the Aiven MySQL service, then add a binding named `HYPERDRIVE` to the Pages project. Enable the `nodejs_compat` compatibility flag for the project. The function runs `SELECT 1` and does not expose database credentials or server errors in its response.
-
-The check only verifies database connectivity; the Express API above continues to provide the application routes. Configure the Pages binding and compatibility flag in the Cloudflare dashboard (or in the project's existing Wrangler configuration) and redeploy. Do not commit Aiven credentials or Hyperdrive IDs.

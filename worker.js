@@ -117,6 +117,34 @@ export default {
       }
     }
 
+    if (url.pathname.startsWith("/api/")) {
+      if (!env.API_ORIGIN) {
+        return jsonError("The API_ORIGIN Worker variable is not configured.", 503);
+      }
+
+      let apiOrigin;
+      try {
+        apiOrigin = new URL(env.API_ORIGIN);
+        if (
+          !["http:", "https:"].includes(apiOrigin.protocol) ||
+          apiOrigin.pathname !== "/" ||
+          apiOrigin.search ||
+          apiOrigin.hash
+        ) {
+          throw new Error("API_ORIGIN must be an HTTP(S) origin without a path.");
+        }
+        if (apiOrigin.host === url.host) {
+          throw new Error("API_ORIGIN must point to the separate Express API host.");
+        }
+      } catch (error) {
+        console.error("Invalid API_ORIGIN Worker variable.", error);
+        return jsonError("The API_ORIGIN Worker variable is invalid.", 503);
+      }
+
+      const upstreamUrl = new URL(`${url.pathname}${url.search}`, apiOrigin);
+      return fetch(new Request(upstreamUrl, request));
+    }
+
     return env.ASSETS.fetch(request);
   }
 };

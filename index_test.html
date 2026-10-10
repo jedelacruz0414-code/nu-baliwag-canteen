@@ -331,8 +331,10 @@ const DB_KEY="nuCanteenDB",SHARED=['tables','ord','res','menu','ann','users','or
 const diningTimerFinishedKey=reservationId=>`nuCanteenDiningFinished:${reservationId}`;
 const hasFinishedDining=reservationId=>reservationId!=null&&localStorage.getItem(diningTimerFinishedKey(reservationId))==="true";
 
-const API_HOST = location.hostname || "localhost";
-const API_BASE = window.CANTEEN_API_BASE || `http://${API_HOST}:3000`;
+const API_BASE = window.CANTEEN_API_BASE ||
+ (location.hostname === "localhost" || location.hostname === "127.0.0.1"
+  ? "http://localhost:3000"
+  : "");
 const API_TOKEN_KEY = "nuCanteenApiToken";
 let apiToken = localStorage.getItem(API_TOKEN_KEY) || "";
 let tableAvailabilityKey = "";

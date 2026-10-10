@@ -30,9 +30,20 @@ Reservation creation and order submission use database transactions. Order total
 
 ## Cloudflare Worker and Hyperdrive binding
 
-The root `worker.js` wraps the static site, exposes `GET /api/db-test` as a MySQL connectivity probe, and supports `POST /api/admin/users` for creating student accounts. It does not migrate or replace the Express API in `backend/src/server.js`. Build with `npm run build` and deploy with `npm run deploy`.
+The root `worker.js` serves the API-connected `index_test.html` as the site's homepage, exposes `GET /api/db-test` as a MySQL connectivity probe, and supports `POST /api/admin/users` for creating student accounts. It does not migrate or replace the Express API in `backend/src/server.js`. Build with `npm run build` and deploy with `npm run deploy`.
 
-In the Cloudflare dashboard, add a Hyperdrive binding named `HYPERDRIVE` to the `nu-baliwag-canteen` Worker and connect it to the Aiven MySQL database. The Wrangler configuration enables `nodejs_compat`; no database credentials or Hyperdrive ID belong in this repository. After adding the binding, redeploy and request `/api/db-test` to verify the connection.
+### Deploying the Express API to Render
+
+1. Push this repository to GitHub, then create a Render Blueprint from the repository and select the root `render.yaml` file. The Blueprint creates a free Node web service from `backend/`.
+2. In Render, enter `DB_HOST`, `DB_USER`, and `DB_PASSWORD` for the MySQL database. The service needs network access to the database. Before first use, create the database tables with `schema.sql` and seed the cafeteria data with `npm run seed` from `backend/` on a machine configured to connect to that database.
+3. Copy the service's public origin from Render (for example, `https://nu-baliwag-canteen-api.onrender.com`).
+4. In the Cloudflare dashboard, set the Worker variable `API_ORIGIN` to that Render origin, without a path, then redeploy the Worker. The Worker forwards other `/api/*` requests there so the frontend can use the same domain.
+
+The Render free service may spin down while idle and take longer to respond on its first request. Keep database credentials in Render's environment settings; do not commit them to this repository.
+
+Verify the Render API and its database connection with `GET /api/health` on the Render service or through the site domain after setting `API_ORIGIN`. The Worker can separately use a Hyperdrive binding for `GET /api/db-test` and `POST /api/admin/users`; that binding is not required by the Render API.
+
+In the Cloudflare dashboard, optionally add a Hyperdrive binding named `HYPERDRIVE` to the `nu-baliwag-canteen` Worker and connect it to the Aiven MySQL database if you need the Worker-specific endpoints above. The Wrangler configuration enables `nodejs_compat`; no database credentials or Hyperdrive ID belong in this repository.
 
 To provision a student, create a random token in PowerShell and set it as a Worker secret:
 

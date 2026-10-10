@@ -117,6 +117,20 @@ label{display:block;font-size:12px;font-weight:600;color:var(--mut);margin-botto
 @media(max-width:860px){.adm{grid-template-columns:minmax(0,1fr)}.side{position:sticky;top:0;z-index:6;height:auto;display:flex;align-items:center;gap:4px;overflow-x:auto;overflow-y:hidden;padding:8px}.brand{flex:0 0 auto;padding:0 8px 0 0;margin:0;border:0}.side>button{flex:0 0 auto;width:auto;white-space:nowrap;margin:0;padding:9px 10px}.side>button:last-child{margin-top:0!important}.cols{grid-template-columns:minmax(0,1fr)}}
 @media(max-width:600px){.topbar{padding:12px 14px;gap:10px;flex-wrap:wrap}.topbar h1{flex:1 1 100%}.topbar input{order:3;flex:1 1 100%;width:100%;max-width:none;margin-left:0}.wrap{padding:14px 12px}.stats{grid-template-columns:repeat(auto-fit,minmax(min(168px,100%),1fr))}.frm{grid-template-columns:minmax(0,1fr)}.row{flex-wrap:wrap}.leg{flex-wrap:wrap;gap:8px}.grid4{grid-template-columns:repeat(2,minmax(0,1fr))}.card{min-width:0;padding:14px}table{display:block;max-width:100%;overflow-x:auto;white-space:nowrap}.mrow{flex-wrap:wrap}.mrow .btn{min-width:120px}}
 @media(max-width:430px){.phone{width:100%;margin:0;border-radius:0;height:100vh;height:100dvh;max-height:100vh;max-height:100dvh}.authwrap{padding:14px}.authtabs button{padding:9px 14px}}
+
+@media(min-width:900px){
+ .authwrap .phone{width:min(480px,calc(100vw - 48px));height:auto;min-height:min(680px,calc(100vh - 48px));max-height:none;margin:0;border-radius:26px}
+ .student-app{width:100%;height:100vh;max-height:none;margin:0;border-radius:0;box-shadow:none;display:grid;grid-template-columns:230px minmax(0,1fr);grid-template-rows:72px minmax(0,1fr)}
+ .student-app .shead{grid-column:1/-1;grid-row:1;padding:16px 28px;min-height:72px}
+ .student-app .sbody{grid-column:2;grid-row:2;width:min(1320px,100%);justify-self:center;padding:28px 32px}
+ .student-app .bnav{grid-column:1;grid-row:2;display:flex;flex-direction:column;justify-content:flex-start;gap:6px;padding:18px 12px;border-top:0;border-right:1px solid var(--line)}
+ .student-app .bnav button{flex:none;display:flex;align-items:center;gap:12px;width:100%;padding:12px 14px;text-align:left;font-size:13px}
+ .student-app .bnav button span{display:inline-block;width:24px;font-size:18px;margin:0;filter:none;opacity:1}
+ .student-app .bnav button.on{background:#eef2f8;border-radius:10px}
+ .student-app.student-reserve .slot-list{grid-template-columns:repeat(3,minmax(0,1fr));max-height:none}
+ .student-app.student-reserve .seatgrid{grid-template-columns:repeat(6,minmax(0,1fr));max-width:680px}
+}
+
 </style></head><body>
 <div id="app"></div>
 <script>
@@ -556,7 +570,7 @@ function student(){
   <div class="ttl" style="margin-bottom:2px">Notifications</div>
   ${notifs.map(n=>`<div class="nitem"><span>${n.ic}</span><div><b style="font-size:12.5px">${n.t}</b><div class="mut" style="font-size:11px">${n.w}</div></div></div>`).join("")}
  </div>`:"";
- return `<div class="phone">${h}${nav}${drawer}${panel}</div>`;
+ return `<div class="phone student-app student-${S.view}">${h}${nav}${drawer}${panel}</div>`;
 }
 /* ---------- ADMIN ---------- */
 const NAV=[["dash","📊 Dashboard"],["res","📅 Reservations"],["tables","🪑 Table Management"],["ord","🧾 Orders"],["menu","🍽 Food Menu"],["inv","📦 Inventory"],["ann","📣 Announcements"],["rep","📈 Reports"],["users","👥 Users"],["set","⚙ Settings"]];

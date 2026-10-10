@@ -4,6 +4,9 @@
   "compatibility_date": "2026-10-10",
   "compatibility_flags": ["nodejs_compat"],
   "main": "./worker.js",
+  "vars": {
+    "API_ORIGIN": "https://nu-baliwag-canteen-api.onrender.com"
+  },
   "assets": {
     "directory": "./dist",
     "binding": "ASSETS",

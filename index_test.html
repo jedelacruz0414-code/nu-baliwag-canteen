@@ -336,6 +336,24 @@ const RESTORABLE_MENU_ITEMS=S.menu.filter(item=>item.c=="Side Courses"||item.c==
 const DB_KEY="nuCanteenDB",SHARED=['tables','ord','res','menu','ann','users','ordSeq','settings','tableLocationLayoutVersion'];
 const diningTimerFinishedKey=reservationId=>`nuCanteenDiningFinished:${reservationId}`;
 const hasFinishedDining=reservationId=>reservationId!=null&&localStorage.getItem(diningTimerFinishedKey(reservationId))==="true";
+const orderTimestampDate=(timestamp,fallback)=>{
+ if(timestamp!=null)return new Date(Number(timestamp));
+ if(!fallback)return null;
+ const value=String(fallback);
+ return new Date(/[zZ]|[+-]\d{2}:?\d{2}$/.test(value)?value:`${value.replace(" ","T")}Z`);
+};
+const formatOrderTimestamp=(timestamp,fallback)=>{
+ const date=orderTimestampDate(timestamp,fallback);
+ return !date||Number.isNaN(date.getTime())?"":new Intl.DateTimeFormat("en-PH",{
+  timeZone:"Asia/Manila",month:"short",day:"numeric",year:"numeric",hour:"numeric",minute:"2-digit"
+ }).format(date);
+};
+const manilaDateFromTimestamp=(timestamp,fallback)=>{
+ const date=orderTimestampDate(timestamp,fallback);
+ return !date||Number.isNaN(date.getTime())?"":new Intl.DateTimeFormat("en-CA",{
+  timeZone:"Asia/Manila",year:"numeric",month:"2-digit",day:"2-digit"
+ }).format(date);
+};
 
 const API_BASE = window.CANTEEN_API_BASE ||
  (location.hostname === "localhost" || location.hostname === "127.0.0.1"
@@ -435,8 +453,8 @@ async function loadApiData(setActiveReservation = true) {
    t: Number(order.tableNumber || 0),
    it: (items || []).map(item => `${item.name} ×${item.quantity}`).join(", "),
    tot: Number(order.total || 0),
-   tm: order.createdAt ? new Date(order.createdAt).toLocaleString() : "",
-  createdAt: order.createdAt || "", date: String(order.date || "").slice(0,10),
+   tm: formatOrderTimestamp(order.createdAtMs, order.createdAt),
+  createdAt: order.createdAt || "", createdAtMs: order.createdAtMs, date: String(order.date || "").slice(0,10),
   slot: String(minutesFromApiSlot(order.slot)),
   st: order.status || "Pending", resId: order.reservationId ? Number(order.reservationId) : null,
   cart: {}, inventoryDeducted: false
@@ -496,8 +514,8 @@ async function loadAdminApiData() {
    id: `ORD-${order.id}`, apiId: Number(order.id), n: order.studentName || "Student",
    sid: order.schoolId || "", t: Number(order.tableNumber || 0),
    it: items.map(item => `${item.name} ×${item.quantity}`).join(", "),
-   tot: Number(order.total || 0), tm: order.createdAt ? new Date(order.createdAt).toLocaleString() : "",
-   createdAt: order.createdAt || "", st: order.status || "Pending",
+   tot: Number(order.total || 0), tm: formatOrderTimestamp(order.createdAtMs, order.createdAt),
+   createdAt: order.createdAt || "", createdAtMs: order.createdAtMs, st: order.status || "Pending",
    resId: order.reservationId ? Number(order.reservationId) : null,
    cart: {}, inventoryDeducted: false
   };
@@ -524,7 +542,7 @@ async function loadAdminApiData() {
   };
  });
  S.todaySales = S.ord
-  .filter(order => order.st === "Completed" && order.createdAt && String(order.createdAt).slice(0, 10) === today)
+  .filter(order => order.st === "Completed" && (order.createdAtMs != null || order.createdAt) && manilaDateFromTimestamp(order.createdAtMs, order.createdAt) === today)
   .reduce((sum, order) => sum + Number(order.tot || 0), 0);
 }
 
@@ -551,8 +569,8 @@ async function refreshStudentOrders() {
     t: Number(order.tableNumber || 0),
     it: (items || []).map(item => `${item.name} ×${item.quantity}`).join(", "),
     tot: Number(order.total || 0),
-    tm: order.createdAt ? new Date(order.createdAt).toLocaleString() : "",
-    createdAt: order.createdAt || "", date: String(order.date || "").slice(0,10),
+    tm: formatOrderTimestamp(order.createdAtMs, order.createdAt),
+    createdAt: order.createdAt || "", createdAtMs: order.createdAtMs, date: String(order.date || "").slice(0,10),
     slot: String(minutesFromApiSlot(order.slot)),
     st: order.status || "Pending", resId: order.reservationId ? Number(order.reservationId) : null,
     cart: {}, inventoryDeducted: false
@@ -659,13 +677,11 @@ const estimatedOrderReadyTime=order=>{
  const date=order.date||reservation?.date;
  const reservedMinutes=Number(order.slot??reservation?.slot);
  if(!date||!Number.isFinite(reservedMinutes))return "To be confirmed";
- const prepMinutes=Math.max(0,Number(S.settings.prepTime??12));
- const reservedAt=new Date(`${date}T00:00:00`);
- reservedAt.setMinutes(reservedMinutes);
- const plannedReadyAt=new Date(reservedAt.getTime()-prepMinutes*60000);
- const orderCreatedAt=new Date(order.createdAt||Date.now());
- const readyAt=plannedReadyAt>=orderCreatedAt?plannedReadyAt:reservedAt;
- return `${formatReservationDate(date)} · ${readyAt.toLocaleTimeString([],{hour:"numeric",minute:"2-digit"})}`;
+ const [year,month,day]=date.split("-").map(Number);
+ const readyMinutes=reservedMinutes-5;
+ const readyAt=new Date(Date.UTC(year,month-1,day,Math.floor(readyMinutes/60)-8,readyMinutes%60));
+ const readyTime=new Intl.DateTimeFormat("en-PH",{timeZone:"Asia/Manila",hour:"numeric",minute:"2-digit"}).format(readyAt);
+ return `${formatReservationDate(date)} · ${readyTime}`;
 };
 
 const formatReservationDate=value=>value?new Date(`${value}T12:00:00`).toLocaleDateString("en-US",{month:"long",day:"numeric",year:"numeric"}):"Select a date";
@@ -676,7 +692,7 @@ const reservationStatus=reservation=>{
 
  if(!reservation)return "Reserved";
 
- if(reservation.st=="Completed")return "Completed";
+ if(reservation.st=="Completed"||(S.role=="s"&&hasFinishedDining(reservation.id)))return "Completed";
 
  const order=reservationOrder(reservation);
 
@@ -1248,7 +1264,7 @@ function student(){
 
    ${reservation?`<p class="mut" style="margin-top:6px">${reservation.tm}</p>`:''}
 
-   <p class="mut" style="margin:12px 0 4px">${S.timerStarted?"Dining time remaining:":"Dining timer:"}</p>${S.timerStarted?`<div class="timer" id="tm">${fmt(S.left)}</div><button class="btn g" style="margin-top:12px" onclick="finishDiningTimer()">DONE EATING</button>`:`<div class="timer" style="color:var(--mut);font-size:20px">Starts once order is completed</div>`}
+   <p class="mut" style="margin:12px 0 4px">${S.timerStarted?"Dining time remaining:":hasFinishedDining(S.activeRes)?"Dining status:":"Dining timer:"}</p>${S.timerStarted?`<div class="timer" id="tm">${fmt(S.left)}</div><button class="btn g" style="margin-top:12px" onclick="finishDiningTimer()">DONE EATING</button>`:hasFinishedDining(S.activeRes)?`<div class="timer" style="color:var(--gr);font-size:20px">Done eating</div>`:`<div class="timer" style="color:var(--mut);font-size:20px">Starts once order is completed</div>`}
 
    <button class="btn" style="margin-top:${S.timerStarted?"10px":"12px"}" onclick="go('mine')">View Reservation</button></div>`:`<div class="card" style="text-align:center"><div class="ttl">Current Reservation</div>
 
@@ -1335,15 +1351,16 @@ function student(){
    <p class="mut" style="margin-bottom:12px">You don't have an active reservation right now.</p><button class="btn" onclick="go('reserve')">RESERVE A TABLE</button></div></div>`;}
   else{const tn=S.sel,t=S.tables.find(x=>x.n==tn),o=S.activeOrder?S.ord.find(x=>x.id==S.activeOrder):null,reservation=S.res.find(item=>item.id==S.activeRes),status=reservationStatus(reservation);
   h=head("My Reservation",'home')+`<div class="sbody">
-   <div class="card" style="background:${status=='Occupied'?'var(--rdb)':'var(--orb)'};border-color:${status=='Occupied'?'#f3a5a5':'#f1d88e'}"><div class="row"><b style="color:${status=='Occupied'?'var(--rd)':'#9a6b00'}">${status=='Occupied'?'Occupied / Serving':'Reservation Confirmed'}</b><span class="badge ${reservationBadgeClass(status)}">${status}</span></div>
+   <div class="card" style="background:${status=='Occupied'?'var(--rdb)':'var(--orb)'};border-color:${status=='Occupied'?'#f3a5a5':'#f1d88e'}"><div class="row"><b style="color:${status=='Occupied'?'var(--rd)':'#9a6b00'}">${status=='Completed'?'Dining Complete':status=='Occupied'?'Occupied / Serving':'Reservation Confirmed'}</b><span class="badge ${reservationBadgeClass(status)}">${status}</span></div>
     <div class="row" style="margin-top:8px"><div><b style="font-size:21px">Table ${tn}</b><div class="mut">👥 ${t?t.seats:4} Seats</div><div class="mut">${reservation?.tm||''}</div></div><span style="font-size:34px">🪑</span></div></div>
    <div class="card" style="text-align:center">${S.timerStarted?`<p class="mut">Dining time remaining</p><div class="timer" id="tm">${fmt(S.left)}</div>
     <button class="btn g" style="margin-top:12px" onclick="finishDiningTimer()">DONE EATING</button>
-    <p class="mut" style="margin-top:8px">Please settle your dining before the time expires.</p>`:`<p class="mut">Dining timer</p><div class="timer" style="color:var(--mut);font-size:26px">Not started yet</div>
-    <p class="mut" style="margin-top:6px">The countdown will start once the cafeteria marks your order as <b>Completed</b>.</p>`}</div>
+     <p class="mut" style="margin-top:8px">Please settle your dining before the time expires.</p>`:hasFinishedDining(S.activeRes)?`<p class="mut">Dining status</p><div class="timer" style="color:var(--gr);font-size:26px">Done eating</div>
+     <p class="mut" style="margin-top:6px">This reservation is complete.</p>`:`<p class="mut">Dining timer</p><div class="timer" style="color:var(--mut);font-size:26px">Not started yet</div>
+     <p class="mut" style="margin-top:6px">The countdown will start once the cafeteria marks your order as <b>Completed</b>.</p>`}</div>
    <div class="card"><div class="ttl">Order Status</div>
   ${!o||o.it=="No pre-order"?'<p class="mut">No food pre-ordered for this reservation.</p>':o.it.split(", ").map((x,i)=>`<div class="food" style="box-shadow:none;margin-bottom:8px"><div class="thumb">${["🍗","🧋","🥘","🍟","🍌"][i%5]}</div><div style="flex:1"><b style="font-size:13.5px">${x}</b><div class="mut" style="color:${o.st=='Ready'?'var(--gr)':o.st=='Completed'?'var(--navy)':'var(--or)'};font-weight:700">${o.st}</div><div class="mut">Estimated ready: ${estimatedOrderReadyTime(o)}</div></div></div>`).join("")}</div>
-  ${status=='Occupied'?'':`<button class="btn d" onclick="cancelReservation(${tn})">CANCEL RESERVATION</button>`}</div>`;}}
+  ${status=="Reserved"?`<button class="btn d" onclick="cancelReservation(${tn})">CANCEL RESERVATION</button>`:""}</div>`;}}
  else if(S.view=='orders'){const orders=studentOrders();h=head("My Orders",0,'<button class="ic" onclick="toggleNotif()">🔔</button>')+`<div class="sbody"><div class="ttl">Current Order</div>
   ${orders.length?`<div class="card"><div class="row"><b>${orders[0].id}</b><span class="badge b-o">${orders[0].st}</span></div><p class="mut" style="margin:6px 0">${orders[0].it}</p><div class="row"><span class="mut">Table ${orders[0].t} · ${orders[0].tm}</span><b>${P(orders[0].tot)}</b></div></div>`:'<div class="card"><p class="mut">You have no orders yet.</p></div>'}
   <div class="ttl">Previous Orders</div>

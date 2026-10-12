@@ -461,7 +461,7 @@ async function loadApiData(setActiveReservation = true) {
   };
  });
  S.ann = (announcementData.announcements || []).map(item => ({
-  t: item.title, d: item.message, w: item.scheduleLabel || "Announcement"
+  id: item.id, t: item.title, d: item.message, w: item.scheduleLabel || "Announcement"
  }));
  if (setActiveReservation) {
   const active = S.res.find(item => ["Reserved","Occupied","Active","Confirmed"].includes(item.st));
@@ -587,6 +587,21 @@ async function refreshStudentOrders() {
   }
  } catch (error) {
   console.error("Student order refresh failed:", error);
+ }
+}
+
+async function refreshStudentAnnouncements() {
+ if (!S.loggedIn || S.role !== "s" || !apiToken) return;
+ try {
+  const data = await apiRequest("/api/announcements");
+  const announcements = (data.announcements || []).map(item => ({
+   id: item.id, t: item.title, d: item.message, w: item.scheduleLabel || "Announcement"
+  }));
+  if (JSON.stringify(announcements) === JSON.stringify(S.ann)) return;
+  S.ann = announcements;
+  if (S.view === "home") r(true);
+ } catch (error) {
+  console.error("Student announcement refresh failed:", error);
  }
 }
 
@@ -1062,7 +1077,16 @@ const annPublish=async()=>{
 
 const annEditStart=i=>{S.annForm={t:S.ann[i].t,d:S.ann[i].d,type:"General",w:S.ann[i].w};S.annEdit=i;r()};
 
-const annDelete=i=>{S.ann.splice(i,1);if(S.annEdit==i)S.annEdit=null;r()};
+const annDelete=async i=>{
+ const announcement=S.ann[i];
+ if(!announcement?.id){alert("Could not delete announcement: missing announcement ID.");return;}
+ try{
+  await apiRequest(`/api/admin/announcements/${encodeURIComponent(announcement.id)}`,{method:"DELETE"});
+  S.ann=S.ann.filter(item=>String(item.id)!==String(announcement.id));
+  S.annEdit=null;
+  r();
+ }catch(error){alert(`Could not delete announcement: ${error.message}`);}
+};
 
 const annCancelEdit=()=>{S.annForm={t:"",d:"",type:"General",w:""};S.annEdit=null;r()};
 
@@ -1496,6 +1520,7 @@ function r(preserveScroll=false){
 }
 setInterval(()=>{refreshAdminData()},15000);
 setInterval(()=>{refreshStudentOrders()},5000);
+setInterval(()=>{refreshStudentAnnouncements()},15000);
 setInterval(()=>{if(!S.timerStarted)return;if(S.left>0)S.left--;const t=document.getElementById("tm");if(t)t.textContent=fmt(S.left);
  if(S.left==0)finishDiningTimer()},1000);
 if(new URLSearchParams(location.search).has('admin')){S.role='a';}

@@ -25,7 +25,7 @@ Node.js REST API backed by MySQL. The root `index.html` remains a browser-only d
 
 Admin login uses the email and password of an active `admin` row in `users`; there is no default SQL password. Create one with the `create-user` command above. The demo credentials in root `index.html` are not SQL credentials.
 
-The API exposes `POST /api/auth/login`, `GET /api/auth/me`, `GET /api/menu`, `GET /api/tables`, student reservation and order routes, admin account/reservation/order routes, and announcement routes. Protected routes require `Authorization: Bearer <token>`.
+The API exposes `POST /api/auth/login`, `GET /api/auth/me`, `GET /api/menu`, `GET /api/tables`, student reservation and order routes, admin account/reservation/order routes, and announcement routes (`GET /api/announcements`, `POST /api/admin/announcements`, and `DELETE /api/admin/announcements/:id`). Protected routes require `Authorization: Bearer <token>`.
 
 Reservation creation and order submission use database transactions. Order totals are calculated from database prices, and stock is deducted once when an administrator marks an order completed.
 

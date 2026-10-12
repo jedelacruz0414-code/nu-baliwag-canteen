@@ -668,6 +668,21 @@ app.post('/api/admin/announcements', requireAuth, requireAdmin, asyncRoute(async
     scheduleLabel
   });
 }));
+// ADMIN: DELETE ANNOUNCEMENT
+app.delete('/api/admin/announcements/:id', requireAuth, requireAdmin, asyncRoute(async (req, res) => {
+  const announcementId = String(req.params.id);
+  if (!/^[1-9]\d*$/.test(announcementId)) {
+    return res.status(400).json({ error: 'Invalid announcement ID.' });
+  }
+  const [result] = await pool.execute(
+    'DELETE FROM announcements WHERE id = ?',
+    [announcementId]
+  );
+  if (!result.affectedRows) {
+    return res.status(404).json({ error: 'Announcement not found.' });
+  }
+  res.json({ id: announcementId });
+}));
 // 404 HANDLER
 app.use((req, res) =>
   res.status(404).json({ error: 'Route not found.' })

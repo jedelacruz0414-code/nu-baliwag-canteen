@@ -550,7 +550,7 @@ async function refreshAdminData() {
  if (!S.loggedIn || S.role !== "a" || !apiToken) return;
  try {
   await loadAdminApiData();
-  if (["dash", "ord", "res", "tables"].includes(S.apage)) r();
+  if (["dash", "ord", "res", "tables", "ann"].includes(S.apage)) r();
  } catch (error) {
   console.error("Admin data refresh failed:", error);
  }
@@ -1077,13 +1077,13 @@ const annPublish=async()=>{
 
 const annEditStart=i=>{S.annForm={t:S.ann[i].t,d:S.ann[i].d,type:"General",w:S.ann[i].w};S.annEdit=i;r()};
 
-const annDelete=async i=>{
- const announcement=S.ann[i];
+const annDelete=async announcementId=>{
+ const announcement=S.ann.find(item=>String(item.id)===String(announcementId));
  if(!announcement?.id){alert("Could not delete announcement: missing announcement ID.");return;}
  try{
   await apiRequest(`/api/admin/announcements/${encodeURIComponent(announcement.id)}`,{method:"DELETE"});
   S.ann=S.ann.filter(item=>String(item.id)!==String(announcement.id));
-  S.annEdit=null;
+  if(S.annEdit!==null)S.annEdit=null;
   r();
  }catch(error){alert(`Could not delete announcement: ${error.message}`);}
 };
@@ -1463,7 +1463,7 @@ function admin(){
   <label>Message</label><textarea rows="4" oninput="annField('d',this.value)" placeholder="Details shown on the student dashboard...">${S.annForm.d}</textarea>
   <div class="frm" style="margin:14px 0"><div><label>Type</label><select onchange="annField('type',this.value)"><option${S.annForm.type=='General'?' selected':''}>General</option><option${S.annForm.type=='Closing time'?' selected':''}>Closing time</option><option${S.annForm.type=='Menu change'?' selected':''}>Menu change</option><option${S.annForm.type=='Maintenance'?' selected':''}>Maintenance</option><option${S.annForm.type=='Holiday schedule'?' selected':''}>Holiday schedule</option></select></div><div><label>Schedule label</label><input value="${S.annForm.w.replace(/"/g,'&quot;')}" oninput="annField('w',this.value)" placeholder="e.g. Today, Sep 20"></div></div>
   <div style="display:flex;gap:8px"><button class="btn" onclick="annPublish()">${S.annEdit!==null?"SAVE CHANGES":"PUBLISH ANNOUNCEMENT"}</button>${S.annEdit!==null?'<button class="btn g" style="border-color:var(--line)" onclick="annCancelEdit()">Cancel</button>':''}</div>`)}
-  ${card("Published",S.ann.length?S.ann.map((a,i)=>`<div style="border-bottom:1px solid var(--line);padding-bottom:11px;margin-bottom:11px"><div class="row"><b style="font-size:13.5px">${a.t}</b><span class="mut">${a.w}</span></div><p class="mut" style="margin:4px 0 8px">${a.d}</p><button class="btn sm g" style="border-color:var(--line)" onclick="annEditStart(${i})">Edit</button> <button class="btn sm d" onclick="annDelete(${i})">Delete</button></div>`).join(""):'<p class="mut">No announcements yet.</p>')}</div>`;}
+  ${card("Published",S.ann.length?S.ann.map((a,i)=>`<div style="border-bottom:1px solid var(--line);padding-bottom:11px;margin-bottom:11px"><div class="row"><b style="font-size:13.5px">${a.t}</b><span class="mut">${a.w}</span></div><p class="mut" style="margin:4px 0 8px">${a.d}</p><button class="btn sm g" style="border-color:var(--line)" onclick="annEditStart(${i})">Edit</button> <button class="btn sm d" onclick="annDelete('${String(a.id).replace(/'/g,"\\'")}')">Delete</button></div>`).join(""):'<p class="mut">No announcements yet.</p>')}</div>`;}
  else if(p=='rep'){const RD={Today:{s:[["Reservations today",52],["Food Orders",68],["Revenue",P(7940)],["Avg. table usage","64%"]],D:[6,9,14,11,7,3,2],p:[22,17,12,9]},
   "This Week":{s:[["Reservations this week",349],["Food Orders",412],["Revenue",P(48620)],["Avg. table usage","72%"]],D:[42,55,38,61,74,49,30],p:[128,96,74,61]},
   "This Month":{s:[["Reservations this month",1480],["Food Orders",1795],["Revenue",P(206400)],["Avg. table usage","69%"]],D:[210,245,198,268],p:[540,410,320,255]},
